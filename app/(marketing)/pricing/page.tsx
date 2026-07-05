@@ -14,7 +14,7 @@ export default function PricingPage() {
     <div className="mx-auto w-full max-w-2xl px-5 py-20 sm:px-6">
       <h1 className="text-center font-display text-4xl font-semibold">Simple pricing</h1>
       <p className="mt-3 text-center text-[15.5px] text-ink-soft">
-        Every plan includes everything: focus sessions, the Book, offline use, backups, and sharing.
+        Every plan includes everything: focus sessions, the Book, offline use, manual export, and optional proof-card sharing.
         Start with a 3-day free trial. A card is required and the subscription begins automatically when the trial ends — cancelling during the trial is free.
       </p>
       <div className="mt-10">

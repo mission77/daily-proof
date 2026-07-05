@@ -14,11 +14,17 @@ export async function createCheckoutResponse(plan: Plan): Promise<NextResponse> 
   }
   try {
     const stripe = getStripe(env);
+    const isMonthly = plan === "monthly";
     const session = await stripe.checkout.sessions.create({
-      mode: plan === "monthly" ? "subscription" : "payment",
+      mode: isMonthly ? "subscription" : "payment",
       line_items: [{ price: priceIdForPlan(env, plan), quantity: 1 }],
       // Card collected up front; billing starts automatically after 3 days.
-      ...(plan === "monthly" ? { subscription_data: { trial_period_days: 3 } } : {}),
+      ...(isMonthly
+        ? {
+            payment_method_collection: "always",
+            subscription_data: { trial_period_days: 3 },
+          }
+        : { customer_creation: "always" }),
       success_url: `${env.appUrl}/upgrade/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${env.appUrl}/upgrade?canceled=1`,
       metadata: { plan },
