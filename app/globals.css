@@ -1,0 +1,296 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------- Tokens ---------- */
+
+:root,
+[data-theme="day"] {
+  /* Warm morning light */
+  --bg: 38 43% 94%; /* #f7f1e8 warm paper */
+  --surface: 40 50% 98%; /* #fdfbf7 */
+  --surface-2: 38 38% 91%;
+  --ink: 30 22% 14%; /* #2b241c rich charcoal */
+  --ink-soft: 30 12% 38%;
+  --ink-faint: 32 10% 55%;
+  --line: 36 24% 84%;
+  --line-strong: 34 20% 74%;
+
+  /* Sacred orange: sunrise gradient endpoints + solid */
+  --ember-a: 22 100% 55%; /* #ff7a1a */
+  --ember-b: 36 100% 62%; /* #ffb43d */
+  --ember: 26 100% 56%;
+  --ember-ink: 26 90% 42%; /* readable orange for small text on light bg */
+
+  /* Flip timer panels are charcoal in both themes */
+  --panel: 28 14% 13%;
+  --panel-hi: 28 12% 18%;
+  --panel-digit: 40 45% 96%;
+
+  --shadow: 30 25% 20%;
+  --ok: 152 45% 34%;
+}
+
+[data-theme="night"] {
+  /* Deep peaceful evening — charcoal, not pure black */
+  --bg: 28 12% 9%; /* #1a1613 */
+  --surface: 28 11% 12%;
+  --surface-2: 28 10% 16%;
+  --ink: 38 32% 91%; /* warm off-white */
+  --ink-soft: 34 14% 66%;
+  --ink-faint: 32 10% 48%;
+  --line: 28 9% 21%;
+  --line-strong: 28 9% 30%;
+
+  --ember-a: 22 100% 58%;
+  --ember-b: 36 100% 64%;
+  --ember: 26 100% 60%;
+  --ember-ink: 30 100% 66%;
+
+  --panel: 28 14% 11%;
+  --panel-hi: 28 12% 16%;
+  --panel-digit: 40 45% 95%;
+
+  --shadow: 0 0% 0%;
+  --ok: 152 40% 55%;
+}
+
+/* ---------- Base ---------- */
+
+html {
+  background: hsl(var(--bg));
+}
+
+body {
+  background: hsl(var(--bg));
+  color: hsl(var(--ink));
+  font-feature-settings: "cv11", "ss01";
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: hsl(var(--ember) / 0.25);
+}
+
+:focus-visible {
+  outline: 2px solid hsl(var(--ember));
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ---------- Wordmark ---------- */
+
+.wordmark-daily {
+  background: linear-gradient(100deg, hsl(var(--ember-a)), hsl(var(--ember-b)));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.wordmark-dot {
+  color: hsl(var(--ember));
+  margin-left: 0.07em;
+}
+
+/* ---------- Buttons ---------- */
+
+.btn-primary {
+  @apply inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 font-medium text-white transition-transform active:scale-[0.98];
+  background: linear-gradient(115deg, hsl(var(--ember-a)), hsl(var(--ember-b)));
+  box-shadow: 0 2px 12px hsl(var(--ember) / 0.28), inset 0 1px 0 hsl(40 100% 80% / 0.35);
+}
+
+.btn-primary:hover {
+  filter: brightness(1.04);
+}
+
+.btn-quiet {
+  @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 font-medium;
+  background: hsl(var(--surface-2));
+  color: hsl(var(--ink));
+  border: 1px solid hsl(var(--line));
+  transition: border-color 160ms ease-out, background-color 160ms ease-out,
+    transform 120ms ease-out;
+}
+
+.btn-quiet:hover {
+  border-color: hsl(var(--line-strong));
+  background: hsl(var(--surface));
+}
+
+.btn-quiet:active {
+  transform: scale(0.985);
+}
+
+.btn-ghost {
+  @apply inline-flex items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-sm transition-colors;
+  color: hsl(var(--ink-soft));
+}
+
+.btn-ghost:hover {
+  color: hsl(var(--ink));
+  background: hsl(var(--surface-2));
+}
+
+.btn-ghost:active {
+  transform: scale(0.98);
+}
+
+/* ---------- Cards ---------- */
+
+.card {
+  background: hsl(var(--surface));
+  border: 1px solid hsl(var(--line));
+  border-radius: 1rem;
+  box-shadow: 0 1px 2px hsl(var(--shadow) / 0.05), 0 8px 24px -12px hsl(var(--shadow) / 0.08);
+  transition: box-shadow 200ms ease-out, border-color 200ms ease-out;
+}
+
+/* ---------- Inputs ---------- */
+
+.field {
+  @apply w-full rounded-xl px-3.5 py-2.5 text-[15px];
+  background: hsl(var(--surface));
+  border: 1px solid hsl(var(--line-strong));
+  color: hsl(var(--ink));
+}
+
+.field::placeholder {
+  color: hsl(var(--ink-faint));
+}
+
+.field:focus {
+  outline: none;
+  border-color: hsl(var(--ember));
+  box-shadow: 0 0 0 3px hsl(var(--ember) / 0.15);
+}
+
+/* ---------- Rolling timer ----------
+   Each digit is a charcoal panel with a two-cell track: [new, old].
+   On change the track rolls DOWN so the new digit descends into view.
+   Whole glyphs only — nothing can render cropped. Orange appears only
+   as a faint seam glow while a digit changes.                       */
+
+.flip-digit {
+  position: relative;
+  width: var(--dw, 3.4rem);
+  height: var(--dh, 4.8rem);
+  overflow: hidden;
+  font-variant-numeric: tabular-nums;
+  border-radius: 0.55rem;
+  color: hsl(var(--panel-digit));
+  background: linear-gradient(hsl(var(--panel-hi)), hsl(var(--panel)) 45%, hsl(28 14% 9%));
+  box-shadow:
+    0 1px 2px hsl(var(--shadow) / 0.3),
+    0 8px 22px -6px hsl(var(--shadow) / 0.4),
+    inset 0 1px 0 hsl(0 0% 100% / 0.06),
+    inset 0 0 0 1px hsl(0 0% 100% / 0.04);
+}
+
+.roll-track {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 200%;
+  display: flex;
+  flex-direction: column;
+  will-change: transform;
+}
+
+.roll-anim {
+  animation: roll-down 440ms cubic-bezier(0.22, 1.02, 0.36, 1);
+}
+
+.roll-cell {
+  height: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--dfs, 3rem);
+  font-weight: 600;
+  line-height: 1;
+}
+
+@keyframes roll-down {
+  0% {
+    transform: translateY(-50%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* Seam line across the middle of each digit; glows faintly during a change */
+.flip-digit::after {
+  content: "";
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  top: 50%;
+  height: 1px;
+  z-index: 5;
+  background: hsl(0 0% 0% / 0.45);
+  pointer-events: none;
+}
+
+.flip-digit.is-flipping::after {
+  background: linear-gradient(90deg, transparent, hsl(var(--ember) / 0.55), transparent);
+  box-shadow: 0 0 8px hsl(var(--ember) / 0.35);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .roll-anim {
+    animation: none;
+  }
+}
+
+.flip-colon {
+  font-size: var(--dfs, 3rem);
+  font-weight: 600;
+  color: hsl(var(--ink-soft));
+  padding: 0 0.15em;
+  font-variant-numeric: tabular-nums;
+  align-self: center;
+  line-height: var(--dh, 4.8rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flip-leaf-top,
+  .flip-leaf-bottom {
+    animation: none !important;
+  }
+  .flip-leaf-top {
+    transform: rotateX(-90deg);
+  }
+  .flip-leaf-bottom {
+    transform: rotateX(0deg);
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---------- Toast ---------- */
+
+.toast-enter {
+  animation: toast-in 220ms ease-out;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---------- Landing flourishes ---------- */
+
+.hero-glow {
+  background: radial-gradient(60% 50% at 50% 0%, hsl(var(--ember) / 0.12), transparent 70%);
+}
