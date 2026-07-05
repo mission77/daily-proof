@@ -5,4 +5,4 @@ export const SITE_NAME = "Daily Proof";
 export const SITE_TAGLINE = "Collect proof that meaningful work happened.";
 export const SITE_DESCRIPTION =
   "Daily Proof helps you focus, finish meaningful work, and keep a private record of the work you actually did. Local-first, offline, and calm by design.";
-export const SUPPORT_EMAIL = "support@dailyproofhq.com";
+export const SUPPORT_EMAIL = "dailyproofhq@gmail.com";

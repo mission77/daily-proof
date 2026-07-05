@@ -8,24 +8,8 @@ export const metadata: Metadata = {
   alternates: { canonical: SITE_URL },
 };
 
-const FAQS = [
-  {
-    q: "Can I use Daily Proof offline?",
-    a: "Yes. Daily Proof is local-first: your practices and your Book live on your device, and the app works fully offline once installed. No connection is needed to focus or to save proof.",
-  },
-  {
-    q: "Can I export my data?",
-    a: "Yes, anytime. Settings includes a one-click backup that exports everything — practices, proof entries, and settings — as a single file you own, and you can import it on any device.",
-  },
-  {
-    q: "Can I cancel anytime?",
-    a: "Yes. The monthly plan can be cancelled at any time and remains active until the end of the billing period. Lifetime is a single purchase with nothing to cancel.",
-  },
-  {
-    q: "What happens after my trial?",
-    a: "After the 3-day trial you can choose monthly or lifetime to keep collecting proof. Everything you saved stays on your device either way, and you can always export your Book.",
-  },
-];
+import { FAQS } from "@/lib/faqs";
+import { FaqList } from "@/components/site/FaqList";
 
 const FEATURES = [
   { title: "Focus Sessions", body: "One practice, one timer, everything else disappears. The session ends with a short written proof — what actually happened." },
@@ -78,25 +62,90 @@ export default function LandingPage() {
           aria-hidden
           className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-gradient-to-b from-ember/10 to-transparent"
         />
-        <div className="mx-auto w-full max-w-3xl px-5 pb-20 pt-24 text-center sm:pt-32">
-          <h1 className="font-display text-4xl font-semibold leading-[1.08] tracking-tight sm:text-[56px]">
+        <div className="mx-auto w-full max-w-3xl px-6 pb-24 pt-28 text-center sm:pb-28 sm:pt-36">
+          <h1 className="mx-auto max-w-[15ch] font-display text-[40px] font-semibold leading-[1.1] tracking-tight sm:text-[56px]">
             Collect proof that meaningful work&nbsp;happened<span className="wordmark-dot">.</span>
           </h1>
-          <p className="mx-auto mt-5 max-w-xl text-[17px] leading-relaxed text-ink-soft">
+          <p className="mx-auto mt-6 max-w-[38ch] text-[17px] leading-relaxed text-ink-soft">
             Daily Proof helps you focus, finish meaningful work, and keep a private record of the
             work you actually did.
           </p>
-          <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link href="/studio" className="btn-primary w-full px-7 py-3 text-[16px] sm:w-auto">
+          <div className="mx-auto mt-10 flex max-w-sm flex-col items-center justify-center gap-3 sm:max-w-none sm:flex-row">
+            <Link href="/studio" className="btn-primary w-full px-8 py-4 text-[16px] sm:w-auto">
               Start Free
             </Link>
-            <Link href="#how" className="btn-quiet w-full px-7 py-3 text-[16px] sm:w-auto">
+            <Link href="#how" className="btn-quiet w-full px-8 py-4 text-[16px] sm:w-auto">
               See how it works
             </Link>
           </div>
-          <p className="mt-4 text-[13px] text-ink-faint">
+          <p className="mt-6 text-[13px] text-ink-faint">
             Free for 3 days · works offline · nothing leaves your device
           </p>
+        </div>
+      </section>
+
+      {/* ---------- Your Proof Book: what the app actually creates ---------- */}
+      <section aria-labelledby="book-preview" className="overflow-x-clip border-t border-line">
+        <div className="mx-auto w-full max-w-4xl px-6 py-20 sm:py-24">
+          <h2 id="book-preview" className="text-center font-display text-3xl font-semibold">
+            Your Proof Book
+          </h2>
+          <p className="mx-auto mt-3 max-w-[42ch] text-center text-[15px] leading-relaxed text-ink-soft">
+            Every session becomes a page. One day, one page — quiet evidence of the work, in your
+            own words.
+          </p>
+          <div className="mt-12 grid gap-6 sm:grid-cols-2" aria-hidden>
+            <div className="card -rotate-1 p-6 shadow-lg transition-transform duration-300 hover:rotate-0">
+              <p className="font-display text-[17px] font-semibold">Tuesday, June 30</p>
+              <div className="mt-4 space-y-4">
+                <div className="border-t border-line pt-4">
+                  <div className="flex items-baseline justify-between gap-3">
+                    <p className="text-[15px] font-semibold">Deep work</p>
+                    <p className="text-[12px] tabular-nums text-ink-faint">6:12 AM</p>
+                  </div>
+                  <p className="mt-0.5 text-[12.5px] text-ink-faint">52 min · Completed</p>
+                  <p className="mt-1.5 text-[13.5px] leading-relaxed text-ink-soft">
+                    Shipped the export flow. Found the thread within ten minutes and stayed on it.
+                  </p>
+                </div>
+                <div className="border-t border-line pt-4">
+                  <div className="flex items-baseline justify-between gap-3">
+                    <p className="text-[15px] font-semibold">Reading</p>
+                    <p className="text-[12px] tabular-nums text-ink-faint">9:40 PM</p>
+                  </div>
+                  <p className="mt-0.5 text-[12.5px] text-ink-faint">25 min · Completed · 18 pages</p>
+                  <p className="mt-1.5 text-[13.5px] leading-relaxed text-ink-soft">
+                    Chapter four. Slower than yesterday, but it landed deeper.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="card rotate-1 p-6 shadow-lg transition-transform duration-300 hover:rotate-0 sm:mt-8">
+              <p className="font-display text-[17px] font-semibold">Wednesday, July 1</p>
+              <div className="mt-4 space-y-4">
+                <div className="border-t border-line pt-4">
+                  <div className="flex items-baseline justify-between gap-3">
+                    <p className="text-[15px] font-semibold">Quran memorization</p>
+                    <p className="text-[12px] tabular-nums text-ink-faint">5:48 AM</p>
+                  </div>
+                  <p className="mt-0.5 text-[12.5px] text-ink-faint">31 min · Completed</p>
+                  <p className="mt-1.5 text-[13.5px] leading-relaxed text-ink-soft">
+                    Two new verses solid. Reviewed yesterday&rsquo;s page before starting.
+                  </p>
+                </div>
+                <div className="border-t border-line pt-4">
+                  <div className="flex items-baseline justify-between gap-3">
+                    <p className="text-[15px] font-semibold">Violin</p>
+                    <p className="text-[12px] tabular-nums text-ink-faint">7:05 PM</p>
+                  </div>
+                  <p className="mt-0.5 text-[12.5px] text-ink-faint">20 min · Ended early</p>
+                  <p className="mt-1.5 text-[13.5px] leading-relaxed text-ink-soft">
+                    Short session, but the difficult passage is finally slowing down for me.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -196,12 +245,28 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ---------- Emotional: planned vs finished ---------- */}
+      <section className="border-t border-line">
+        <div className="mx-auto w-full max-w-2xl px-6 py-20 text-center sm:py-24">
+          <h2 className="mx-auto max-w-[22ch] font-display text-3xl font-semibold leading-snug sm:text-4xl">
+            Most people remember what they planned. Successful people remember what they
+            finished<span className="wordmark-dot">.</span>
+          </h2>
+          <p className="mx-auto mt-6 max-w-[44ch] text-[15.5px] leading-relaxed text-ink-soft">
+            A to-do list is a promise. Daily Proof is a receipt. When the session ends, what
+            remains isn&rsquo;t a checked box — it&rsquo;s a record: what you worked on, how long
+            you stayed, and what actually happened. Read it back in a month and you won&rsquo;t
+            wonder whether you&rsquo;re making progress. You&rsquo;ll have proof.
+          </p>
+        </div>
+      </section>
+
       {/* ---------- Pricing ---------- */}
       <section id="pricing" className="border-t border-line bg-surface2/40">
         <div className="mx-auto w-full max-w-4xl px-5 py-20 sm:px-6">
           <h2 className="text-center font-display text-3xl font-semibold">Simple pricing</h2>
           <p className="mt-2 text-center text-[15px] text-ink-soft">Try everything free for 3 days.</p>
-          <div className="mx-auto mt-10 grid max-w-3xl gap-4 sm:grid-cols-3">
+          <div className="mx-auto mt-12 grid max-w-3xl items-start gap-4 sm:grid-cols-3">
             <div className="card p-6">
               <p className="text-sm font-medium text-ink-soft">Free</p>
               <p className="mt-1 font-display text-3xl font-semibold">3 days</p>
@@ -220,7 +285,7 @@ export default function LandingPage() {
                 Choose monthly
               </Link>
             </div>
-            <div className="card relative p-6">
+            <div className="card relative p-6 shadow-lg ring-1 ring-ember/40 sm:-mt-3 sm:pb-8">
               <span className="absolute right-4 top-4 rounded-full bg-ember/10 px-2.5 py-0.5 text-[12px] font-medium text-ember-ink">
                 Launch
               </span>
@@ -241,14 +306,9 @@ export default function LandingPage() {
       <section className="border-t border-line">
         <div className="mx-auto w-full max-w-2xl px-5 py-20 sm:px-6">
           <h2 className="text-center font-display text-3xl font-semibold">Questions, answered</h2>
-          <dl className="mt-10 space-y-3">
-            {FAQS.map((f) => (
-              <div key={f.q} className="card p-5">
-                <dt className="font-display text-[16.5px] font-semibold">{f.q}</dt>
-                <dd className="mt-1.5 text-[14.5px] leading-relaxed text-ink-soft">{f.a}</dd>
-              </div>
-            ))}
-          </dl>
+          <div className="mt-10">
+            <FaqList />
+          </div>
           <div className="mt-12 text-center">
             <Link href="/studio" className="btn-primary px-8 py-3 text-[16px]">
               Begin your first page

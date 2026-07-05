@@ -488,6 +488,31 @@ for (const asset of ["/manifest.webmanifest", "/sw.js", "/offline.html", "/icons
   await m.ctx.close();
 }
 
+// ---------- Mobile navigation ----------
+{
+  const m = await newPage({ width: 390, height: 844 });
+  await m.page.goto(BASE + "/");
+  const burger = m.page.getByRole("button", { name: "Open menu" });
+  check("Mobile shows hamburger", await burger.isVisible());
+  check(
+    "Mobile hides inline nav",
+    !(await m.page.locator('nav[aria-label="Main"]').isVisible().catch(() => false))
+  );
+  await burger.click();
+  const menu = m.page.locator("#mobile-menu");
+  await menu.getByRole("link", { name: "Pricing" }).waitFor({ state: "visible" });
+  check("Slide-in menu opens with nav items", true);
+  check(
+    "Menu has Open the App",
+    await menu.getByRole("link", { name: "Open the App" }).isVisible()
+  );
+  await m.page.screenshot({ path: `${SHOTS}/21-mobile-menu.png` });
+  await menu.getByRole("link", { name: "Pricing" }).click();
+  await m.page.waitForURL("**/pricing");
+  check("Menu link navigates and closes", true);
+  await m.ctx.close();
+}
+
 // ---------- Access guard: expired free user sees paywall ----------
 {
   const g = await newPage();
