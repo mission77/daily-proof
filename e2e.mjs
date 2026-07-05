@@ -525,6 +525,104 @@ for (const [label, vp] of [
   await f.ctx.close();
 }
 
+// ---------- License / access codes ----------
+{
+  const { execSync } = await import("node:child_process");
+  const SECRET = "e2e-test-secret";
+  const mint = (args) =>
+    execSync(`node scripts/generate-codes.mjs ${args}`, {
+      env: { ...process.env, LICENSE_SIGNING_SECRET: SECRET },
+    })
+      .toString()
+      .trim()
+      .split("\n")[0];
+
+  const betaCode = mint("--role beta --days 30");
+  const ownerCode = mint("--role owner");
+  const founderCode = mint("--role lifetime --prefix FOUNDER");
+  const expiredCode = mint("--role beta --days -10");
+
+  const api = async (code) => {
+    const res = await page.request.post(BASE + "/api/license/validate", { data: { code } });
+    return { status: res.status(), body: await res.json() };
+  };
+
+  const beta = await api(betaCode);
+  check("Beta code validates with expiry", beta.body.valid === true && beta.body.role === "beta" && !!beta.body.expiresAt);
+  const owner = await api(ownerCode);
+  check("Owner code validates, never expires", owner.body.valid === true && owner.body.role === "owner" && owner.body.expiresAt === null);
+  const founder = await api(founderCode);
+  check("FOUNDER-prefixed lifetime code validates", founder.body.valid === true && founder.body.role === "lifetime");
+  const expired = await api(expiredCode);
+  check("Expired code rejected with reason", expired.body.valid === false && expired.body.reason === "expired");
+  const tampered = await api(betaCode.slice(0, -4) + "AAAA");
+  check("Tampered code rejected", tampered.body.valid === false);
+  const garbage = await api("HELLO-WORLD");
+  check("Malformed code rejected", garbage.body.valid === false && garbage.body.reason === "malformed");
+
+  // Full UI flow: expired free user redeems a beta code and gets back in.
+  const g = await newPage();
+  await g.page.goto(BASE + "/studio");
+  await g.page.waitForSelector("text=Your first proof begins with one");
+  await g.page.evaluate(async () => {
+    const db = await new Promise((resolve, reject) => {
+      const req = indexedDB.open("daily-proof");
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+    await new Promise((resolve, reject) => {
+      const tx = db.transaction("access", "readwrite");
+      tx.objectStore("access").put({
+        key: "access",
+        role: "free",
+        trialStartedAt: new Date(Date.now() - 5 * 86400000).toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
+      tx.oncomplete = resolve;
+      tx.onerror = () => reject(tx.error);
+    });
+    db.close();
+  });
+  await g.page.reload();
+  await g.page.waitForSelector("text=Your trial has ended.");
+  await g.page.goto(BASE + "/settings");
+  await g.page.fill("#s-code", betaCode);
+  await g.page.getByRole("button", { name: "Redeem" }).click();
+  await g.page.waitForSelector("text=Access updated: Beta");
+  check("Code redemption flow updates access", true);
+  await g.page.goto(BASE + "/studio");
+  await g.page.waitForSelector("text=What deserves your attention");
+  const paywalled = await g.page.getByText("Your trial has ended.").isVisible().catch(() => false);
+  check("Beta license unlocks the app", !paywalled);
+  // Replace with a different code
+  await g.page.goto(BASE + "/settings");
+  await g.page.fill("#s-code", founderCode);
+  await g.page.getByRole("button", { name: "Redeem" }).click();
+  await g.page.waitForSelector("text=Access updated: Lifetime");
+  check("License can be replaced with another code", true);
+  // Invalid code shows a friendly error without changing anything
+  await g.page.fill("#s-code", betaCode.slice(0, -4) + "ZZZZ");
+  await g.page.getByRole("button", { name: "Redeem" }).click();
+  await g.page.waitForSelector("text=This code isn't valid.");
+  check("Invalid code shows friendly error", true);
+  await g.ctx.close();
+}
+
+// ---------- Stripe named routes (no keys in this environment) ----------
+{
+  const monthly = await page.request.post(BASE + "/api/stripe/checkout", { data: {} });
+  check("Named monthly route degrades without keys", monthly.status() === 503);
+  const lifetime = await page.request.post(BASE + "/api/stripe/lifetime", { data: {} });
+  check("Named lifetime route degrades without keys", lifetime.status() === 503);
+  const portal = await page.request.post(BASE + "/api/stripe/customer-portal", { data: { customerId: "cus_x" } });
+  check("Portal route degrades without keys", portal.status() === 503);
+  const c = await newPage();
+  await c.page.goto(BASE + "/upgrade?canceled=1");
+  await c.page.waitForSelector("text=Checkout was cancelled");
+  check("Cancel page shows gentle note", true);
+  await c.ctx.close();
+}
+
 // ---------- Access guard: expired free user sees paywall ----------
 {
   const g = await newPage();

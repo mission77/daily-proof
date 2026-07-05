@@ -27,7 +27,8 @@ export async function GET(req: NextRequest) {
       (session.payment_status === "paid" ||
         // Subscriptions with a trial start unpaid but active.
         session.payment_status === "no_payment_required");
-    return NextResponse.json({ paid, plan });
+    const customerId = typeof session.customer === "string" ? session.customer : null;
+    return NextResponse.json({ paid, plan, customerId });
   } catch (err) {
     console.error("Stripe verify error:", err);
     return NextResponse.json({ error: "verify_failed" }, { status: 502 });

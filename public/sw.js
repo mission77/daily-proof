@@ -6,7 +6,7 @@
    - Everything else same-origin GET: stale-while-revalidate.
    - Versioned cache name + activate cleanup avoids stale updates. */
 
-const VERSION = "v1.3.0";
+const VERSION = "v1.4.0";
 const CACHE = `daily-proof-${VERSION}`;
 const OFFLINE_URL = "/offline.html";
 const PRECACHE = [

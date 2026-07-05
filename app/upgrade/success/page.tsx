@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { setAccessRole } from "@/lib/repos/access";
+import { setAccessRole, setStripeCustomerId } from "@/lib/repos/access";
 import { Wordmark } from "@/components/Wordmark";
 
 type State = "verifying" | "unlocked" | "failed";
@@ -28,6 +28,7 @@ function SuccessInner() {
         if (cancelled) return;
         if (res.ok && data.paid) {
           await setAccessRole(data.plan === "lifetime" ? "lifetime" : "premium");
+          if (data.customerId) await setStripeCustomerId(data.customerId);
           setState("unlocked");
           setTimeout(() => router.replace("/studio"), 1600);
         } else {

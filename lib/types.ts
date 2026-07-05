@@ -55,12 +55,21 @@ export interface SettingRecord {
 
 // ---------- Access model (foundation only, no billing wired) ----------
 
-export type AccessRole = "owner" | "lifetime" | "premium" | "free";
+export type AccessRole = "owner" | "lifetime" | "premium" | "beta" | "free";
+
+export interface StoredLicense {
+  code: string;
+  role: AccessRole;
+  expiresAt: string | null; // ISO, null = never
+  validatedAt: string; // ISO
+}
 
 export interface AccessState {
   key: "access"; // singleton
   role: AccessRole;
   trialStartedAt: string | null; // ISO, set on first launch for free role
+  license?: StoredLicense; // present after redeeming an access code
+  stripeCustomerId?: string; // set after a verified checkout, for the billing portal
   updatedAt: string;
 }
 
@@ -143,7 +152,7 @@ export function isAccessRecord(v: unknown): v is AccessState {
     !!a &&
     typeof a === "object" &&
     a.key === "access" &&
-    (a.role === "owner" || a.role === "lifetime" || a.role === "premium" || a.role === "free")
+    (a.role === "owner" || a.role === "lifetime" || a.role === "premium" || a.role === "beta" || a.role === "free")
   );
 }
 

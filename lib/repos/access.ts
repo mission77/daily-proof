@@ -2,7 +2,7 @@
 // Owner: permanent access. Lifetime: one-time purchase. Premium: monthly. Free: 3-day trial.
 
 import { STORES, idbGet, idbPut } from "@/lib/db";
-import { AccessRole, AccessState, isAccessRecord, nowIso } from "@/lib/types";
+import { AccessRole, AccessState, StoredLicense, isAccessRecord, nowIso } from "@/lib/types";
 
 export const TRIAL_DAYS = 3;
 
@@ -36,12 +36,45 @@ export async function setAccessRole(role: AccessRole): Promise<AccessState> {
   return next;
 }
 
+/** True when a stored license is past its expiry. */
+export function licenseExpired(license: StoredLicense, now: Date = new Date()): boolean {
+  return license.expiresAt !== null && new Date(license.expiresAt).getTime() < now.getTime();
+}
+
+/** The role that actually applies right now: an expired license (e.g. a beta
+ *  code past its date) falls back to the free trial state gracefully. */
+export function effectiveRole(state: AccessState, now: Date = new Date()): AccessRole {
+  if (state.license && licenseExpired(state.license, now)) return "free";
+  return state.role;
+}
+
 export function hasFullAccess(state: AccessState): boolean {
-  return state.role === "owner" || state.role === "lifetime" || state.role === "premium";
+  const role = effectiveRole(state);
+  return role === "owner" || role === "lifetime" || role === "premium" || role === "beta";
+}
+
+/** Saves a validated license and applies its role. Redeeming a new code
+ *  simply replaces the previous license. */
+export async function applyLicense(license: StoredLicense): Promise<AccessState> {
+  const current = await getAccessState();
+  const next: AccessState = {
+    ...current,
+    role: license.role,
+    license,
+    updatedAt: nowIso(),
+  };
+  await idbPut(STORES.access, next);
+  return next;
+}
+
+/** Records the Stripe customer id after a verified checkout (for the portal). */
+export async function setStripeCustomerId(customerId: string): Promise<void> {
+  const current = await getAccessState();
+  await idbPut(STORES.access, { ...current, stripeCustomerId: customerId, updatedAt: nowIso() });
 }
 
 export function trialDaysLeft(state: AccessState, now: Date = new Date()): number | null {
-  if (state.role !== "free") return null;
+  if (effectiveRole(state, now) !== "free") return null;
   if (!state.trialStartedAt) return TRIAL_DAYS;
   const elapsed = now.getTime() - new Date(state.trialStartedAt).getTime();
   const left = TRIAL_DAYS - elapsed / 86_400_000;
@@ -65,6 +98,8 @@ export function roleLabel(role: AccessRole): string {
       return "Lifetime";
     case "premium":
       return "Premium";
+    case "beta":
+      return "Beta";
     case "free":
       return "Free trial";
   }

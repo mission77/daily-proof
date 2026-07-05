@@ -12,12 +12,12 @@ import { FAQS } from "@/lib/faqs";
 import { FaqList } from "@/components/site/FaqList";
 
 const FEATURES = [
-  { title: "Focus Sessions", body: "One practice, one timer, everything else disappears. The session ends with a short written proof — what actually happened." },
-  { title: "Book", body: "One day, one page. Your proof collects into a quiet journal you can read back — not a dashboard, not a chart." },
-  { title: "Offline First", body: "Works with no connection at all. Install it once and Daily Proof is there on a plane, in a library, anywhere." },
-  { title: "Private by Default", body: "No account. No tracking. No analytics watching over your shoulder. Your record belongs to you alone." },
-  { title: "Export Anytime", body: "Your entire Book exports as a single file whenever you like. Import it anywhere. You are never locked in." },
-  { title: "Beautiful Sharing", body: "After a session, optionally generate an elegant proof card — a quiet certificate of the work, ready for any platform." },
+  { title: "Finish what you started.", body: "One practice, one timer, everything else disappears — until the work is done and written down." },
+  { title: "Remember what you actually did.", body: "One day, one page. A quiet journal you can read back, not a chart you have to feed." },
+  { title: "Your focus doesn't need Wi-Fi.", body: "Install it once and it works anywhere — a plane, a library, a cabin with no signal." },
+  { title: "Nobody is watching.", body: "No account. No tracking. No analytics over your shoulder. The record is yours alone." },
+  { title: "Your work stays yours.", body: "Your entire Book exports as a single file, anytime. Import it anywhere. Never locked in." },
+  { title: "Proof worth showing.", body: "When you want to, turn a session into an elegant proof card. When you don't, nothing asks." },
 ];
 
 function FaqJsonLd() {
@@ -63,7 +63,7 @@ export default function LandingPage() {
           className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-gradient-to-b from-ember/10 to-transparent"
         />
         <div className="mx-auto w-full max-w-3xl px-6 pb-16 pt-14 text-center sm:pb-24 sm:pt-24">
-          <h1 className="mx-auto max-w-[15ch] font-display text-[38px] font-semibold leading-[1.1] tracking-tight sm:max-w-[24ch] sm:text-[54px]">
+          <h1 className="mx-auto max-w-[15ch] font-display text-[38px] font-semibold leading-[1.1] tracking-tight sm:max-w-[22ch] sm:text-[52px]">
             Collect proof that meaningful work&nbsp;happened<span className="wordmark-dot">.</span>
           </h1>
           <p className="mx-auto mt-5 max-w-[38ch] text-[16.5px] leading-relaxed text-ink-soft">
@@ -81,6 +81,20 @@ export default function LandingPage() {
           <p className="mt-5 text-[13px] text-ink-faint">
             3-day free trial · works offline · nothing leaves your device
           </p>
+
+          {/* The product in five seconds */}
+          <div
+            aria-label="How Daily Proof works"
+            className="mx-auto mt-9 flex max-w-md flex-wrap items-center justify-center gap-x-2.5 gap-y-1.5 text-[13.5px] text-ink-soft"
+          >
+            <span>Choose a practice</span>
+            <span aria-hidden className="text-ember">→</span>
+            <span>Start a session</span>
+            <span aria-hidden className="text-ember">→</span>
+            <span>Reflect</span>
+            <span aria-hidden className="text-ember">→</span>
+            <span className="font-medium text-ink">Your Book grows</span>
+          </div>
         </div>
       </section>
 
@@ -101,15 +115,12 @@ export default function LandingPage() {
                 <div className="flex items-baseline justify-between gap-3">
                   <p className="text-[15px] font-semibold">Deep Work</p>
                 </div>
-                <p className="mt-1 text-[12.5px] text-ink-faint">1h 42m · Completed</p>
-                <p className="mt-2 text-[13.5px] leading-relaxed text-ink-soft">
-                  Built the first launch version of Daily Proof.
-                </p>
+                <p className="mt-1 text-[12.5px] text-ink-faint">27 min · Ended early</p>
                 <p className="mt-3 text-[12px] font-medium uppercase tracking-[0.12em] text-ink-faint">
                   Reflection
                 </p>
                 <p className="mt-1 font-display text-[13.5px] italic leading-relaxed text-ink-soft">
-                  Got stuck twice, stayed with it, shipped anyway.
+                  Couldn&rsquo;t focus today. Started too late. Tomorrow starts earlier.
                 </p>
               </div>
             </div>
@@ -153,8 +164,20 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ---------- One honest page ---------- */}
+      <section className="border-t border-line bg-surface2/40">
+        <div className="mx-auto w-full max-w-2xl px-6 py-20 text-center sm:py-24">
+          <p className="font-display text-2xl font-semibold leading-relaxed sm:text-3xl">
+            One honest page. Every day.
+          </p>
+          <p className="mx-auto mt-4 max-w-[34ch] text-[16px] leading-relaxed text-ink-soft">
+            Years from now you&rsquo;ll remember what you actually built.
+          </p>
+        </div>
+      </section>
+
       {/* ---------- How it works ---------- */}
-      <section id="how" className="border-t border-line bg-surface2/40">
+      <section id="how" className="border-t border-line">
         <div className="mx-auto w-full max-w-4xl px-5 py-20 sm:px-6">
           <h2 className="text-center font-display text-3xl font-semibold">How it works</h2>
           <p className="mt-2 text-center text-[15px] text-ink-soft">Three simple steps.</p>
@@ -181,14 +204,12 @@ export default function LandingPage() {
         <div className="mx-auto w-full max-w-3xl px-5 py-20 sm:px-6">
           <h2 className="font-display text-3xl font-semibold">Why Daily Proof</h2>
           <p className="mt-5 text-[16px] leading-relaxed text-ink-soft">
-            Daily Proof is <strong className="font-semibold text-ink">not</strong> another habit
-            tracker. Not another streak app. Not another productivity dashboard. Those tools measure
-            you — chains to protect, graphs to feed, guilt when a day breaks.
+            Not a habit tracker. Not a streak app. Not a dashboard. Those tools measure you —
+            chains to protect, guilt when a day breaks.
           </p>
           <p className="mt-4 text-[16px] leading-relaxed text-ink-soft">
-            Daily Proof is a record of showing up. You sit down, you do the work, and the work
-            leaves evidence: what you did, how long, what happened. No badges pretending to be
-            meaning. Just a growing, private record that you kept showing up for what matters.
+            Daily Proof is a record of showing up. Do the work, and the work leaves evidence: what
+            you did, how long, what happened. Nothing more.
           </p>
         </div>
       </section>
@@ -281,7 +302,10 @@ export default function LandingPage() {
                 Start Free
               </Link>
             </div>
-            <div className="card p-6">
+            <div className="card relative p-6 shadow-lg ring-1 ring-ember/40 sm:-mt-3 sm:pb-8">
+              <span className="absolute right-4 top-4 rounded-full bg-ember/10 px-2.5 py-0.5 text-[12px] font-medium text-ember-ink">
+                Most flexible
+              </span>
               <p className="text-sm font-medium text-ink-soft">Premium</p>
               <p className="mt-1 font-display text-3xl font-semibold">
                 $7<span className="text-base font-normal text-ink-faint">/month</span>
@@ -289,11 +313,11 @@ export default function LandingPage() {
               <p className="mt-2 text-[14px] text-ink-soft">
                 After your 3-day trial. Cancel anytime.
               </p>
-              <Link href="/pricing" className="btn-quiet mt-5 block w-full text-center">
-                Choose monthly
+              <Link href="/pricing" className="btn-primary mt-5 block w-full text-center">
+                Start free trial
               </Link>
             </div>
-            <div className="card relative p-6 shadow-lg ring-1 ring-ember/40 sm:-mt-3 sm:pb-8">
+            <div className="card relative p-6">
               <span className="absolute right-4 top-4 rounded-full bg-ember/10 px-2.5 py-0.5 text-[12px] font-medium text-ember-ink">
                 Launch
               </span>
@@ -304,7 +328,7 @@ export default function LandingPage() {
               <p className="mt-2 text-[14px] text-ink-soft">
                 One purchase, yours forever. Limited-time launch offer.
               </p>
-              <Link href="/pricing" className="btn-primary mt-5 block w-full text-center">
+              <Link href="/pricing" className="btn-quiet mt-5 block w-full text-center">
                 Get lifetime
               </Link>
             </div>

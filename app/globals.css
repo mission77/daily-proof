@@ -306,3 +306,24 @@ body {
 .hero-glow {
   background: radial-gradient(60% 50% at 50% 0%, hsl(var(--ember) / 0.12), transparent 70%);
 }
+
+/* ---------- Scroll reveal: quiet fade-up, nothing more ---------- */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 600ms ease-out, transform 600ms ease-out;
+}
+
+.reveal-in {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
