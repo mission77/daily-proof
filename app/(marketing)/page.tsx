@@ -44,7 +44,7 @@ function AppJsonLd() {
     description: SITE_DESCRIPTION,
     offers: [
       { "@type": "Offer", price: "7", priceCurrency: "USD", name: "Premium (monthly)" },
-      { "@type": "Offer", price: "70", priceCurrency: "USD", name: "Lifetime (launch)" },
+      { "@type": "Offer", price: "70", priceCurrency: "USD", name: "Founding Member Lifetime (launch offer)" },
     ],
   };
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} />;
@@ -62,15 +62,15 @@ export default function LandingPage() {
           aria-hidden
           className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-gradient-to-b from-ember/10 to-transparent"
         />
-        <div className="mx-auto w-full max-w-3xl px-6 pb-24 pt-28 text-center sm:pb-28 sm:pt-36">
-          <h1 className="mx-auto max-w-[15ch] font-display text-[40px] font-semibold leading-[1.1] tracking-tight sm:text-[56px]">
+        <div className="mx-auto w-full max-w-3xl px-6 pb-16 pt-14 text-center sm:pb-24 sm:pt-24">
+          <h1 className="mx-auto max-w-[15ch] font-display text-[38px] font-semibold leading-[1.1] tracking-tight sm:max-w-[24ch] sm:text-[54px]">
             Collect proof that meaningful work&nbsp;happened<span className="wordmark-dot">.</span>
           </h1>
-          <p className="mx-auto mt-6 max-w-[38ch] text-[17px] leading-relaxed text-ink-soft">
+          <p className="mx-auto mt-5 max-w-[38ch] text-[16.5px] leading-relaxed text-ink-soft">
             Daily Proof helps you focus, finish meaningful work, and keep a private record of the
             work you actually did.
           </p>
-          <div className="mx-auto mt-10 flex max-w-sm flex-col items-center justify-center gap-3 sm:max-w-none sm:flex-row">
+          <div className="mx-auto mt-8 flex max-w-sm flex-col items-center justify-center gap-3 sm:max-w-none sm:flex-row">
             <Link href="/studio" className="btn-primary w-full px-8 py-4 text-[16px] sm:w-auto">
               Start Free
             </Link>
@@ -78,15 +78,15 @@ export default function LandingPage() {
               See how it works
             </Link>
           </div>
-          <p className="mt-6 text-[13px] text-ink-faint">
-            Free for 3 days · works offline · nothing leaves your device
+          <p className="mt-5 text-[13px] text-ink-faint">
+            3-day free trial · works offline · nothing leaves your device
           </p>
         </div>
       </section>
 
       {/* ---------- Your Proof Book: what the app actually creates ---------- */}
       <section aria-labelledby="book-preview" className="overflow-x-clip border-t border-line">
-        <div className="mx-auto w-full max-w-4xl px-6 py-20 sm:py-24">
+        <div className="mx-auto w-full max-w-5xl px-6 py-16 sm:py-20">
           <h2 id="book-preview" className="text-center font-display text-3xl font-semibold">
             Your Proof Book
           </h2>
@@ -94,55 +94,59 @@ export default function LandingPage() {
             Every session becomes a page. One day, one page — quiet evidence of the work, in your
             own words.
           </p>
-          <div className="mt-12 grid gap-6 sm:grid-cols-2" aria-hidden>
+          <div className="mt-10 grid gap-6 md:grid-cols-3" aria-hidden>
             <div className="card -rotate-1 p-6 shadow-lg transition-transform duration-300 hover:rotate-0">
-              <p className="font-display text-[17px] font-semibold">Tuesday, June 30</p>
-              <div className="mt-4 space-y-4">
-                <div className="border-t border-line pt-4">
-                  <div className="flex items-baseline justify-between gap-3">
-                    <p className="text-[15px] font-semibold">Deep work</p>
-                    <p className="text-[12px] tabular-nums text-ink-faint">6:12 AM</p>
-                  </div>
-                  <p className="mt-0.5 text-[12.5px] text-ink-faint">52 min · Completed</p>
-                  <p className="mt-1.5 text-[13.5px] leading-relaxed text-ink-soft">
-                    Shipped the export flow. Found the thread within ten minutes and stayed on it.
-                  </p>
+              <p className="font-display text-[16px] font-semibold">Monday, July 6</p>
+              <div className="mt-4 border-t border-line pt-4">
+                <div className="flex items-baseline justify-between gap-3">
+                  <p className="text-[15px] font-semibold">Deep Work</p>
                 </div>
-                <div className="border-t border-line pt-4">
-                  <div className="flex items-baseline justify-between gap-3">
-                    <p className="text-[15px] font-semibold">Reading</p>
-                    <p className="text-[12px] tabular-nums text-ink-faint">9:40 PM</p>
-                  </div>
-                  <p className="mt-0.5 text-[12.5px] text-ink-faint">25 min · Completed · 18 pages</p>
-                  <p className="mt-1.5 text-[13.5px] leading-relaxed text-ink-soft">
-                    Chapter four. Slower than yesterday, but it landed deeper.
-                  </p>
-                </div>
+                <p className="mt-1 text-[12.5px] text-ink-faint">1h 42m · Completed</p>
+                <p className="mt-2 text-[13.5px] leading-relaxed text-ink-soft">
+                  Built the first launch version of Daily Proof.
+                </p>
+                <p className="mt-3 text-[12px] font-medium uppercase tracking-[0.12em] text-ink-faint">
+                  Reflection
+                </p>
+                <p className="mt-1 font-display text-[13.5px] italic leading-relaxed text-ink-soft">
+                  Got stuck twice, stayed with it, shipped anyway.
+                </p>
               </div>
             </div>
-            <div className="card rotate-1 p-6 shadow-lg transition-transform duration-300 hover:rotate-0 sm:mt-8">
-              <p className="font-display text-[17px] font-semibold">Wednesday, July 1</p>
-              <div className="mt-4 space-y-4">
-                <div className="border-t border-line pt-4">
-                  <div className="flex items-baseline justify-between gap-3">
-                    <p className="text-[15px] font-semibold">Quran memorization</p>
-                    <p className="text-[12px] tabular-nums text-ink-faint">5:48 AM</p>
-                  </div>
-                  <p className="mt-0.5 text-[12.5px] text-ink-faint">31 min · Completed</p>
-                  <p className="mt-1.5 text-[13.5px] leading-relaxed text-ink-soft">
-                    Two new verses solid. Reviewed yesterday&rsquo;s page before starting.
-                  </p>
+            <div className="card p-6 shadow-lg transition-transform duration-300 md:mt-6">
+              <p className="font-display text-[16px] font-semibold">Tuesday, July 7</p>
+              <div className="mt-4 border-t border-line pt-4">
+                <div className="flex items-baseline justify-between gap-3">
+                  <p className="text-[15px] font-semibold">Reading</p>
                 </div>
-                <div className="border-t border-line pt-4">
-                  <div className="flex items-baseline justify-between gap-3">
-                    <p className="text-[15px] font-semibold">Violin</p>
-                    <p className="text-[12px] tabular-nums text-ink-faint">7:05 PM</p>
-                  </div>
-                  <p className="mt-0.5 text-[12.5px] text-ink-faint">20 min · Ended early</p>
-                  <p className="mt-1.5 text-[13.5px] leading-relaxed text-ink-soft">
-                    Short session, but the difficult passage is finally slowing down for me.
-                  </p>
+                <p className="mt-1 text-[12.5px] text-ink-faint">38m · Completed · 22 pages</p>
+                <p className="mt-2 text-[13.5px] leading-relaxed text-ink-soft">
+                  Read and summarized one chapter.
+                </p>
+                <p className="mt-3 text-[12px] font-medium uppercase tracking-[0.12em] text-ink-faint">
+                  Reflection
+                </p>
+                <p className="mt-1 font-display text-[13.5px] italic leading-relaxed text-ink-soft">
+                  Slow session, but the idea finally became clear.
+                </p>
+              </div>
+            </div>
+            <div className="card rotate-1 p-6 shadow-lg transition-transform duration-300 hover:rotate-0">
+              <p className="font-display text-[16px] font-semibold">Wednesday, July 8</p>
+              <div className="mt-4 border-t border-line pt-4">
+                <div className="flex items-baseline justify-between gap-3">
+                  <p className="text-[15px] font-semibold">Training</p>
                 </div>
+                <p className="mt-1 text-[12.5px] text-ink-faint">47m · Completed · 3 miles</p>
+                <p className="mt-2 text-[13.5px] leading-relaxed text-ink-soft">
+                  Finished the run without checking the phone.
+                </p>
+                <p className="mt-3 text-[12px] font-medium uppercase tracking-[0.12em] text-ink-faint">
+                  Reflection
+                </p>
+                <p className="mt-1 font-display text-[13.5px] italic leading-relaxed text-ink-soft">
+                  Not perfect, but honest effort.
+                </p>
               </div>
             </div>
           </div>
@@ -268,10 +272,12 @@ export default function LandingPage() {
           <p className="mt-2 text-center text-[15px] text-ink-soft">Try everything free for 3 days.</p>
           <div className="mx-auto mt-12 grid max-w-3xl items-start gap-4 sm:grid-cols-3">
             <div className="card p-6">
-              <p className="text-sm font-medium text-ink-soft">Free</p>
+              <p className="text-sm font-medium text-ink-soft">Free trial</p>
               <p className="mt-1 font-display text-3xl font-semibold">3 days</p>
-              <p className="mt-2 text-[14px] text-ink-soft">Every feature, no card required.</p>
-              <Link href="/studio" className="btn-quiet mt-5 block w-full text-center">
+              <p className="mt-2 text-[14px] text-ink-soft">
+                Every feature. Card required; cancel anytime during the trial.
+              </p>
+              <Link href="/pricing" className="btn-quiet mt-5 block w-full text-center">
                 Start Free
               </Link>
             </div>
@@ -280,7 +286,9 @@ export default function LandingPage() {
               <p className="mt-1 font-display text-3xl font-semibold">
                 $7<span className="text-base font-normal text-ink-faint">/month</span>
               </p>
-              <p className="mt-2 text-[14px] text-ink-soft">Everything, as long as you need it.</p>
+              <p className="mt-2 text-[14px] text-ink-soft">
+                After your 3-day trial. Cancel anytime.
+              </p>
               <Link href="/pricing" className="btn-quiet mt-5 block w-full text-center">
                 Choose monthly
               </Link>
@@ -289,11 +297,13 @@ export default function LandingPage() {
               <span className="absolute right-4 top-4 rounded-full bg-ember/10 px-2.5 py-0.5 text-[12px] font-medium text-ember-ink">
                 Launch
               </span>
-              <p className="text-sm font-medium text-ink-soft">Lifetime</p>
+              <p className="text-sm font-medium text-ink-soft">Founding Member Lifetime</p>
               <p className="mt-1 font-display text-3xl font-semibold">
                 $70<span className="text-base font-normal text-ink-faint"> once</span>
               </p>
-              <p className="mt-2 text-[14px] text-ink-soft">One purchase. Yours forever.</p>
+              <p className="mt-2 text-[14px] text-ink-soft">
+                One purchase, yours forever. Limited-time launch offer.
+              </p>
               <Link href="/pricing" className="btn-primary mt-5 block w-full text-center">
                 Get lifetime
               </Link>

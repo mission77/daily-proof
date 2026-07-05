@@ -54,7 +54,9 @@ export function PlanPicker() {
           <p className="mt-1 font-display text-3xl font-semibold">
             $7<span className="text-base font-normal text-ink-faint">/month</span>
           </p>
-          <p className="mt-2 text-[14px] text-ink-soft">3-day free trial, then $7 a month.</p>
+          <p className="mt-2 text-[14px] text-ink-soft">
+            3-day free trial, then $7/month automatically. Card required; cancel anytime.
+          </p>
           <button
             className="btn-primary mt-5 w-full"
             disabled={disabled || busy !== null}
@@ -67,11 +69,13 @@ export function PlanPicker() {
           <span className="absolute right-4 top-4 rounded-full bg-ember/10 px-2.5 py-0.5 text-[12px] font-medium text-ember-ink">
             Launch
           </span>
-          <p className="text-sm font-medium text-ink-soft">Lifetime</p>
+          <p className="text-sm font-medium text-ink-soft">Founding Member Lifetime</p>
           <p className="mt-1 font-display text-3xl font-semibold">
             $70<span className="text-base font-normal text-ink-faint"> once</span>
           </p>
-          <p className="mt-2 text-[14px] text-ink-soft">One purchase. Yours forever.</p>
+          <p className="mt-2 text-[14px] text-ink-soft">
+            One purchase, yours forever. Limited-time launch offer.
+          </p>
           <button
             className="btn-quiet mt-5 w-full"
             disabled={disabled || busy !== null}

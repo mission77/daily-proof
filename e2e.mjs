@@ -513,6 +513,18 @@ for (const asset of ["/manifest.webmanifest", "/sw.js", "/offline.html", "/icons
   await m.ctx.close();
 }
 
+// ---------- Hero above the fold ----------
+for (const [label, vp] of [
+  ["phone-visible", { width: 390, height: 700 }],
+  ["laptop", { width: 1366, height: 768 }],
+]) {
+  const f = await newPage(vp);
+  await f.page.goto(BASE + "/");
+  const cta = await f.page.getByRole("link", { name: "Start Free" }).first().boundingBox();
+  check(`Hero CTA above the fold (${label})`, !!cta && cta.y + cta.height <= vp.height);
+  await f.ctx.close();
+}
+
 // ---------- Access guard: expired free user sees paywall ----------
 {
   const g = await newPage();

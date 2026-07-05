@@ -5,7 +5,7 @@ import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Pricing",
-  description: "Try Daily Proof free for 3 days, then $7/month or $70 once for lifetime access.",
+  description: "Try Daily Proof free for 3 days (card required), then $7/month — or $70 once as a Founding Member, for life.",
   alternates: { canonical: `${SITE_URL}/pricing` },
 };
 
@@ -15,7 +15,7 @@ export default function PricingPage() {
       <h1 className="text-center font-display text-4xl font-semibold">Simple pricing</h1>
       <p className="mt-3 text-center text-[15.5px] text-ink-soft">
         Every plan includes everything: focus sessions, the Book, offline use, backups, and sharing.
-        Start with a 3-day free trial — no card required.
+        Start with a 3-day free trial. A card is required and the subscription begins automatically when the trial ends — cancelling during the trial is free.
       </p>
       <div className="mt-10">
         <PlanPicker />
