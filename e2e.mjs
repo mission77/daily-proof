@@ -278,12 +278,15 @@ for (const asset of ["/manifest.webmanifest", "/sw.js", "/offline.html", "/icons
 
   const up = await newPage();
   await up.page.goto(BASE + "/upgrade");
-  await up.page.waitForSelector("text=Payments are not configured yet");
-  check("Upgrade page explains unconfigured payments", true);
-  check(
-    "Upgrade buttons disabled without keys",
-    await up.page.getByRole("button", { name: "Start free trial" }).isDisabled()
-  );
+  await up.page.getByRole("button", { name: "Start 3-day trial" }).waitFor({ state: "visible" });
+  const configNote = await up.page
+    .getByText("Payments are not configured yet")
+    .isVisible()
+    .catch(() => false);
+  check("Config note hidden in production", !configNote);
+  await up.page.getByRole("button", { name: "Start 3-day trial" }).click();
+  await up.page.waitForSelector("text=Checkout is temporarily unavailable");
+  check("Unavailable checkout fails calmly in production", true);
   await up.page.screenshot({ path: `${SHOTS}/16-upgrade.png` });
   await up.ctx.close();
 }
@@ -520,7 +523,7 @@ for (const [label, vp] of [
 ]) {
   const f = await newPage(vp);
   await f.page.goto(BASE + "/");
-  const cta = await f.page.getByRole("link", { name: "Start Free" }).first().boundingBox();
+  const cta = await f.page.getByRole("button", { name: "Start 3-day trial" }).first().boundingBox();
   check(`Hero CTA above the fold (${label})`, !!cta && cta.y + cta.height <= vp.height);
   await f.ctx.close();
 }
@@ -621,6 +624,16 @@ for (const [label, vp] of [
   await c.page.waitForSelector("text=Checkout was cancelled");
   check("Cancel page shows gentle note", true);
   await c.ctx.close();
+}
+
+// ---------- Hero CTA fallback without keys ----------
+{
+  const h = await newPage();
+  await h.page.goto(BASE + "/");
+  await h.page.getByRole("button", { name: "Start 3-day trial" }).first().click();
+  await h.page.waitForURL("**/pricing");
+  check("Hero trial CTA falls back to pricing without keys", true);
+  await h.ctx.close();
 }
 
 // ---------- Access guard: expired free user sees paywall ----------

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CheckoutButton } from "@/components/CheckoutButton";
 import type { Metadata } from "next";
 import { SITE_DESCRIPTION, SITE_URL } from "@/lib/site";
 
@@ -71,29 +72,32 @@ export default function LandingPage() {
             work you actually did.
           </p>
           <div className="mx-auto mt-8 flex max-w-sm flex-col items-center justify-center gap-3 sm:max-w-none sm:flex-row">
-            <Link href="/studio" className="btn-primary w-full px-8 py-4 text-[16px] sm:w-auto">
-              Start Free
-            </Link>
+            <CheckoutButton
+              plan="monthly"
+              label="Start 3-day trial"
+              className="btn-primary w-full px-8 py-4 text-[16px] sm:w-auto"
+              fallbackHref="/pricing"
+            />
             <Link href="#how" className="btn-quiet w-full px-8 py-4 text-[16px] sm:w-auto">
               See how it works
             </Link>
           </div>
           <p className="mt-5 text-[13px] text-ink-faint">
-            3-day free trial · works offline · nothing leaves your device
+            3-day trial · card required · then $7/month
           </p>
 
-          {/* The product in five seconds */}
+          {/* The product in five seconds — quiet, native to the design */}
           <div
             aria-label="How Daily Proof works"
-            className="mx-auto mt-9 flex max-w-md flex-wrap items-center justify-center gap-x-2.5 gap-y-1.5 text-[13.5px] text-ink-soft"
+            className="mx-auto mt-10 inline-flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 rounded-full border border-line bg-surface/70 px-5 py-2.5 text-[13px] font-medium tracking-wide text-ink-soft"
           >
-            <span>Choose a practice</span>
-            <span aria-hidden className="text-ember">→</span>
-            <span>Start a session</span>
-            <span aria-hidden className="text-ember">→</span>
-            <span>Reflect</span>
-            <span aria-hidden className="text-ember">→</span>
-            <span className="font-medium text-ink">Your Book grows</span>
+            <span>Practice</span>
+            <span aria-hidden className="h-1 w-1 rounded-full bg-ember/70" />
+            <span>Session</span>
+            <span aria-hidden className="h-1 w-1 rounded-full bg-ember/70" />
+            <span>Reflection</span>
+            <span aria-hidden className="h-1 w-1 rounded-full bg-ember/70" />
+            <span className="text-ink">Book</span>
           </div>
         </div>
       </section>
@@ -290,47 +294,45 @@ export default function LandingPage() {
       <section id="pricing" className="border-t border-line bg-surface2/40">
         <div className="mx-auto w-full max-w-4xl px-5 py-20 sm:px-6">
           <h2 className="text-center font-display text-3xl font-semibold">Simple pricing</h2>
-          <p className="mt-2 text-center text-[15px] text-ink-soft">Try everything free for 3 days.</p>
-          <div className="mx-auto mt-12 grid max-w-3xl items-start gap-4 sm:grid-cols-3">
-            <div className="card p-6">
-              <p className="text-sm font-medium text-ink-soft">Free trial</p>
-              <p className="mt-1 font-display text-3xl font-semibold">3 days</p>
-              <p className="mt-2 text-[14px] text-ink-soft">
-                Every feature. Card required; cancel anytime during the trial.
-              </p>
-              <Link href="/pricing" className="btn-quiet mt-5 block w-full text-center">
-                Start Free
-              </Link>
-            </div>
+          <p className="mt-2 text-center text-[15px] text-ink-soft">
+            3-day trial · card required · then $7/month — or one payment, forever.
+          </p>
+          <div className="mx-auto mt-12 grid max-w-2xl items-start gap-4 sm:grid-cols-2">
             <div className="card relative p-6 shadow-lg ring-1 ring-ember/40 sm:-mt-3 sm:pb-8">
               <span className="absolute right-4 top-4 rounded-full bg-ember/10 px-2.5 py-0.5 text-[12px] font-medium text-ember-ink">
-                Most flexible
+                Recommended
               </span>
-              <p className="text-sm font-medium text-ink-soft">Premium</p>
+              <p className="text-sm font-medium text-ink-soft">Monthly</p>
               <p className="mt-1 font-display text-3xl font-semibold">
                 $7<span className="text-base font-normal text-ink-faint">/month</span>
               </p>
               <p className="mt-2 text-[14px] text-ink-soft">
-                After your 3-day trial. Cancel anytime.
+                Includes 3-day trial. Card required. Then $7/month unless canceled.
               </p>
-              <Link href="/pricing" className="btn-primary mt-5 block w-full text-center">
-                Start free trial
-              </Link>
+              <CheckoutButton
+                plan="monthly"
+                label="Start 3-day trial"
+                className="btn-primary mt-5 block w-full text-center"
+                fallbackHref="/pricing"
+              />
             </div>
             <div className="card relative p-6">
               <span className="absolute right-4 top-4 rounded-full bg-ember/10 px-2.5 py-0.5 text-[12px] font-medium text-ember-ink">
                 Launch
               </span>
-              <p className="text-sm font-medium text-ink-soft">Founding Member Lifetime</p>
+              <p className="text-sm font-medium text-ink-soft">Lifetime</p>
               <p className="mt-1 font-display text-3xl font-semibold">
                 $70<span className="text-base font-normal text-ink-faint"> once</span>
               </p>
               <p className="mt-2 text-[14px] text-ink-soft">
-                One purchase, yours forever. Limited-time launch offer.
+                Founding Member Lifetime. One purchase, yours forever.
               </p>
-              <Link href="/pricing" className="btn-quiet mt-5 block w-full text-center">
-                Get lifetime
-              </Link>
+              <CheckoutButton
+                plan="lifetime"
+                label="Buy lifetime"
+                className="btn-quiet mt-5 block w-full text-center"
+                fallbackHref="/pricing"
+              />
             </div>
           </div>
         </div>
