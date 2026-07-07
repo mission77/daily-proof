@@ -1,25 +1,17 @@
-import Link from "next/link";
-import { CheckoutButton } from "@/components/CheckoutButton";
+import Image from "next/image";
 import type { Metadata } from "next";
 import { SITE_DESCRIPTION, SITE_URL } from "@/lib/site";
+import { FAQS } from "@/lib/faqs";
+import { FaqList } from "@/components/site/FaqList";
+import { BetaForm } from "@/components/site/BetaForm";
+import { Reveal } from "@/components/site/Reveal";
 
 export const metadata: Metadata = {
   title: "Daily Proof — Collect proof that meaningful work happened",
-  description: SITE_DESCRIPTION,
+  description:
+    "A private place to focus, reflect, and build a book of your real work. The first Founding Beta opens in a few days.",
   alternates: { canonical: SITE_URL },
 };
-
-import { FAQS } from "@/lib/faqs";
-import { FaqList } from "@/components/site/FaqList";
-
-const FEATURES = [
-  { title: "Finish what you started.", body: "One practice, one timer, everything else disappears — until the work is done and written down." },
-  { title: "Remember what you actually did.", body: "One day, one page. A quiet journal you can read back, not a chart you have to feed." },
-  { title: "Your focus doesn't need Wi-Fi.", body: "Install it once and it works anywhere — a plane, a library, a cabin with no signal." },
-  { title: "Nobody is watching.", body: "No account. No tracking. No analytics over your shoulder. The record is yours alone." },
-  { title: "Your work stays yours.", body: "Your entire Book exports as a single file, anytime. Import it anywhere. Never locked in." },
-  { title: "Proof worth showing.", body: "When you want to, turn a session into an elegant proof card. When you don't, nothing asks." },
-];
 
 function FaqJsonLd() {
   const data = {
@@ -43,13 +35,56 @@ function AppJsonLd() {
     operatingSystem: "Web",
     url: SITE_URL,
     description: SITE_DESCRIPTION,
-    offers: [
-      { "@type": "Offer", price: "7", priceCurrency: "USD", name: "Premium (monthly)" },
-      { "@type": "Offer", price: "70", priceCurrency: "USD", name: "Founding Member Lifetime (launch offer)" },
-    ],
   };
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} />;
 }
+
+/** A product screenshot in a quiet device-like frame. */
+function Screen({ src, alt, priority = false }: { src: string; alt: string; priority?: boolean }) {
+  return (
+    <div className="mx-auto w-full max-w-[300px] overflow-hidden rounded-2xl border border-line bg-surface shadow-lg">
+      <Image src={src} alt={alt} width={840} height={1560} priority={priority} className="h-auto w-full" />
+    </div>
+  );
+}
+
+const STEPS = [
+  {
+    n: "1",
+    title: "Create a Practice",
+    copy: "Choose something meaningful. Qur'an study. Writing. Deep work. Reading. Running. Anything worth showing up for.",
+    src: "/screens/create.png",
+    alt: "Creating a practice in Daily Proof",
+  },
+  {
+    n: "2",
+    title: "Focus",
+    copy: "Start a distraction-free session. One session. One intention.",
+    src: "/screens/focus.png",
+    alt: "The Daily Proof focus timer during a session",
+  },
+  {
+    n: "3",
+    title: "Reflect",
+    copy: "Write a few honest thoughts while they're still fresh. Capture what mattered.",
+    src: "/screens/finish.png",
+    alt: "Reflecting after a finished session",
+  },
+  {
+    n: "4",
+    title: "Build Your Proof Book",
+    copy: "Every completed session becomes another page of your progress. No streak pressure. No social validation. Just honest evidence.",
+    src: "/screens/book.png",
+    alt: "The Proof Book showing a day of saved sessions",
+  },
+];
+
+const PRIVACY_CARDS = [
+  { title: "No Account Required", body: "Daily Proof works without creating an account." },
+  { title: "No Tracking", body: "Your work isn't analyzed, profiled or sold." },
+  { title: "Local First", body: "Your data stays on your own device." },
+  { title: "You Own Your Work", body: "Export your Proof Book whenever you want." },
+];
 
 export default function LandingPage() {
   return (
@@ -57,298 +92,143 @@ export default function LandingPage() {
       <FaqJsonLd />
       <AppJsonLd />
 
-      {/* ---------- Hero ---------- */}
-      <section className="relative overflow-hidden">
+      {/* ---------- 1 · Hero ---------- */}
+      <section className="relative flex min-h-[100dvh] flex-col overflow-hidden">
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-gradient-to-b from-ember/10 to-transparent"
+          className="pointer-events-none absolute inset-x-0 top-0 h-80 bg-gradient-to-b from-ember/10 to-transparent"
         />
-        <div className="mx-auto w-full max-w-3xl px-6 pb-16 pt-14 text-center sm:pb-24 sm:pt-24">
+        <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center px-6 py-16 text-center">
           <h1 className="mx-auto max-w-[15ch] font-display text-[38px] font-semibold leading-[1.1] tracking-tight sm:max-w-[22ch] sm:text-[52px]">
             Collect proof that meaningful work&nbsp;happened<span className="wordmark-dot">.</span>
           </h1>
-          <p className="mx-auto mt-5 max-w-[38ch] text-[16.5px] leading-relaxed text-ink-soft">
-            Daily Proof helps you focus, finish meaningful work, and keep a private record of the
-            work you actually did.
+          <p className="mx-auto mt-5 max-w-[42ch] text-[16.5px] leading-relaxed text-ink-soft">
+            Daily Proof is a private place to focus, reflect, and build a book of your real work.
           </p>
-          <div className="mx-auto mt-8 flex max-w-sm flex-col items-center justify-center gap-3 sm:max-w-none sm:flex-row">
-            <CheckoutButton
-              plan="monthly"
-              label="Start 3-day trial"
-              className="btn-primary w-full px-8 py-4 text-[16px] sm:w-auto"
-              fallbackHref="/pricing"
-            />
-            <Link href="#how" className="btn-quiet w-full px-8 py-4 text-[16px] sm:w-auto">
-              See how it works
-            </Link>
+          <p className="mt-3 text-[14px] font-medium text-ember-ink">
+            Opening the first Founding Beta in a few days.
+          </p>
+          <div className="mx-auto mt-8 flex w-full max-w-sm flex-col items-center justify-center gap-3 sm:max-w-none sm:flex-row">
+            <a href="#beta" className="btn-primary w-full px-8 py-4 text-[16px] sm:w-auto">
+              Request Beta Invitation
+            </a>
+            <a href="#how" className="btn-quiet w-full px-8 py-4 text-[16px] sm:w-auto">
+              See How It Works
+            </a>
           </div>
-          <p className="mt-5 text-[13px] text-ink-faint">
-            3-day trial · card required · then $7/month
-          </p>
+        </div>
+        <p className="pb-8 text-center text-[13px] text-ink-faint" aria-hidden>
+          Scroll to see how it works ↓
+        </p>
+      </section>
 
-          {/* The product in five seconds — quiet, native to the design */}
-          <div
-            aria-label="How Daily Proof works"
-            className="mx-auto mt-10 inline-flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 rounded-full border border-line bg-surface/70 px-5 py-2.5 text-[13px] font-medium tracking-wide text-ink-soft"
-          >
-            <span>Practice</span>
-            <span aria-hidden className="h-1 w-1 rounded-full bg-ember/70" />
-            <span>Session</span>
-            <span aria-hidden className="h-1 w-1 rounded-full bg-ember/70" />
-            <span>Reflection</span>
-            <span aria-hidden className="h-1 w-1 rounded-full bg-ember/70" />
-            <span className="text-ink">Book</span>
-          </div>
+      {/* ---------- 2 · Why I Built Daily Proof ---------- */}
+      <section className="border-t border-line">
+        <div className="mx-auto grid w-full max-w-4xl items-center gap-12 px-6 py-20 sm:grid-cols-2 sm:py-28">
+          <Reveal>
+            <h2 className="font-display text-3xl font-semibold">Why I Built Daily Proof</h2>
+            <div className="mt-6 space-y-4 text-[16px] leading-relaxed text-ink-soft">
+              <p>I wanted three small things and couldn&rsquo;t find them in one place.</p>
+              <p>
+                A timer — because watching time pass keeps me honest while I work. One quiet place
+                to keep my reflections and thoughts. And proof of what I actually finished, instead
+                of another productivity system telling me what to do next.
+              </p>
+              <p>So I spent months building it.</p>
+              <p className="font-medium text-ink">
+                No social feed. No streak pressure. Just honest proof.
+              </p>
+            </div>
+          </Reveal>
+          <Reveal>
+            <Screen src="/screens/studio.png" alt="The Daily Proof Studio with today's focus" />
+          </Reveal>
         </div>
       </section>
 
-      {/* ---------- Your Proof Book: what the app actually creates ---------- */}
-      <section aria-labelledby="book-preview" className="overflow-x-clip border-t border-line">
-        <div className="mx-auto w-full max-w-5xl px-6 py-16 sm:py-20">
-          <h2 id="book-preview" className="text-center font-display text-3xl font-semibold">
-            Your Proof Book
-          </h2>
-          <p className="mx-auto mt-3 max-w-[42ch] text-center text-[15px] leading-relaxed text-ink-soft">
-            Every session becomes a page. One day, one page — quiet evidence of the work, in your
-            own words.
-          </p>
-          <div className="mt-10 grid gap-6 md:grid-cols-3" aria-hidden>
-            <div className="card -rotate-1 p-6 shadow-lg transition-transform duration-300 hover:rotate-0">
-              <p className="font-display text-[16px] font-semibold">Monday, July 6</p>
-              <div className="mt-4 border-t border-line pt-4">
-                <div className="flex items-baseline justify-between gap-3">
-                  <p className="text-[15px] font-semibold">Deep Work</p>
+      {/* ---------- 3 · How It Works ---------- */}
+      <section id="how" className="border-t border-line bg-surface2/40">
+        <div className="mx-auto w-full max-w-4xl px-6 py-20 sm:py-28">
+          <h2 className="text-center font-display text-3xl font-semibold">How It Works</h2>
+          <div className="mt-14 space-y-16 sm:space-y-20">
+            {STEPS.map((s, i) => (
+              <Reveal key={s.n}>
+                <div
+                  className={`grid items-center gap-8 sm:grid-cols-2 sm:gap-12 ${
+                    i % 2 === 1 ? "sm:[&>*:first-child]:order-2" : ""
+                  }`}
+                >
+                  <div className="text-center sm:text-left">
+                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-ember/10 font-display text-[15px] font-semibold text-ember-ink">
+                      {s.n}
+                    </span>
+                    <h3 className="mt-4 font-display text-2xl font-semibold">{s.title}</h3>
+                    <p className="mx-auto mt-2.5 max-w-[40ch] text-[15.5px] leading-relaxed text-ink-soft sm:mx-0">
+                      {s.copy}
+                    </p>
+                  </div>
+                  <Screen src={s.src} alt={s.alt} />
                 </div>
-                <p className="mt-1 text-[12.5px] text-ink-faint">27 min · Ended early</p>
-                <p className="mt-3 text-[12px] font-medium uppercase tracking-[0.12em] text-ink-faint">
-                  Reflection
-                </p>
-                <p className="mt-1 font-display text-[13.5px] italic leading-relaxed text-ink-soft">
-                  Couldn&rsquo;t focus today. Started too late. Tomorrow starts earlier.
-                </p>
-              </div>
-            </div>
-            <div className="card p-6 shadow-lg transition-transform duration-300 md:mt-6">
-              <p className="font-display text-[16px] font-semibold">Tuesday, July 7</p>
-              <div className="mt-4 border-t border-line pt-4">
-                <div className="flex items-baseline justify-between gap-3">
-                  <p className="text-[15px] font-semibold">Reading</p>
-                </div>
-                <p className="mt-1 text-[12.5px] text-ink-faint">38m · Completed · 22 pages</p>
-                <p className="mt-2 text-[13.5px] leading-relaxed text-ink-soft">
-                  Read and summarized one chapter.
-                </p>
-                <p className="mt-3 text-[12px] font-medium uppercase tracking-[0.12em] text-ink-faint">
-                  Reflection
-                </p>
-                <p className="mt-1 font-display text-[13.5px] italic leading-relaxed text-ink-soft">
-                  Slow session, but the idea finally became clear.
-                </p>
-              </div>
-            </div>
-            <div className="card rotate-1 p-6 shadow-lg transition-transform duration-300 hover:rotate-0">
-              <p className="font-display text-[16px] font-semibold">Wednesday, July 8</p>
-              <div className="mt-4 border-t border-line pt-4">
-                <div className="flex items-baseline justify-between gap-3">
-                  <p className="text-[15px] font-semibold">Training</p>
-                </div>
-                <p className="mt-1 text-[12.5px] text-ink-faint">47m · Completed · 3 miles</p>
-                <p className="mt-2 text-[13.5px] leading-relaxed text-ink-soft">
-                  Finished the run without checking the phone.
-                </p>
-                <p className="mt-3 text-[12px] font-medium uppercase tracking-[0.12em] text-ink-faint">
-                  Reflection
-                </p>
-                <p className="mt-1 font-display text-[13.5px] italic leading-relaxed text-ink-soft">
-                  Not perfect, but honest effort.
-                </p>
-              </div>
-            </div>
+              </Reveal>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ---------- One honest page ---------- */}
-      <section className="border-t border-line bg-surface2/40">
-        <div className="mx-auto w-full max-w-2xl px-6 py-20 text-center sm:py-24">
-          <p className="font-display text-2xl font-semibold leading-relaxed sm:text-3xl">
-            One honest page. Every day.
-          </p>
-          <p className="mx-auto mt-4 max-w-[34ch] text-[16px] leading-relaxed text-ink-soft">
-            Years from now you&rsquo;ll remember what you actually built.
-          </p>
+      {/* ---------- 4 · Private by Design ---------- */}
+      <section className="border-t border-line">
+        <div className="mx-auto w-full max-w-4xl px-6 py-20 sm:py-28">
+          <h2 className="text-center font-display text-3xl font-semibold">Private by Design</h2>
+          <div className="mt-10 grid gap-5 sm:grid-cols-2">
+            {PRIVACY_CARDS.map((c) => (
+              <Reveal key={c.title}>
+                <div className="card h-full p-6">
+                  <h3 className="font-display text-lg font-semibold">{c.title}</h3>
+                  <p className="mt-1.5 text-[14.5px] leading-relaxed text-ink-soft">{c.body}</p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* ---------- How it works ---------- */}
-      <section id="how" className="border-t border-line">
-        <div className="mx-auto w-full max-w-4xl px-5 py-20 sm:px-6">
-          <h2 className="text-center font-display text-3xl font-semibold">How it works</h2>
-          <p className="mt-2 text-center text-[15px] text-ink-soft">Three simple steps.</p>
-          <ol className="mt-10 grid gap-6 sm:grid-cols-3">
+      {/* ---------- 5 · Founding Beta ---------- */}
+      <section id="beta" className="border-t border-line bg-surface2/40 scroll-mt-16">
+        <div className="mx-auto w-full max-w-2xl px-6 py-20 sm:py-28">
+          <h2 className="text-center font-display text-3xl font-semibold">Founding Beta</h2>
+          <p className="mx-auto mt-4 max-w-[48ch] text-center text-[15.5px] leading-relaxed text-ink-soft">
+            Daily Proof is almost ready. Before opening it publicly, I&rsquo;m inviting a small
+            group of people to help shape the first version.
+          </p>
+          <ul className="mx-auto mt-7 max-w-sm space-y-2.5 text-[15px] text-ink-soft">
             {[
-              { n: "1", t: "Choose your practice.", b: "Name the work that matters — writing, deep work, an instrument, a craft." },
-              { n: "2", t: "Focus.", b: "Start a session and everything else disappears. Just you, the work, and a timer counting up." },
-              { n: "3", t: "Collect proof.", b: "Finish, note what happened, and save. A permanent page in your Book." },
-            ].map((s) => (
-              <li key={s.n} className="card p-6">
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-ember/10 font-display text-[15px] font-semibold text-ember-ink">
-                  {s.n}
-                </span>
-                <h3 className="mt-4 font-display text-lg font-semibold">{s.t}</h3>
-                <p className="mt-1.5 text-[14.5px] leading-relaxed text-ink-soft">{s.b}</p>
+              "Early access before public launch",
+              "Direct influence on the product",
+              "A personal invitation to the first beta",
+            ].map((b) => (
+              <li key={b} className="flex items-start gap-2.5">
+                <span aria-hidden className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-ember" />
+                {b}
               </li>
             ))}
-          </ol>
-        </div>
-      </section>
-
-      {/* ---------- Why Daily Proof ---------- */}
-      <section className="border-t border-line">
-        <div className="mx-auto w-full max-w-3xl px-5 py-20 sm:px-6">
-          <h2 className="font-display text-3xl font-semibold">Why Daily Proof</h2>
-          <p className="mt-5 text-[16px] leading-relaxed text-ink-soft">
-            Not a habit tracker. Not a streak app. Not a dashboard. Those tools measure you —
-            chains to protect, guilt when a day breaks.
-          </p>
-          <p className="mt-4 text-[16px] leading-relaxed text-ink-soft">
-            Daily Proof is a record of showing up. Do the work, and the work leaves evidence: what
-            you did, how long, what happened. Nothing more.
-          </p>
-        </div>
-      </section>
-
-      {/* ---------- Features ---------- */}
-      <section className="border-t border-line bg-surface2/40">
-        <div className="mx-auto w-full max-w-4xl px-5 py-20 sm:px-6">
-          <h2 className="text-center font-display text-3xl font-semibold">Built for the work</h2>
-          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {FEATURES.map((f) => (
-              <div key={f.title} className="card p-6">
-                <h3 className="font-display text-lg font-semibold">{f.title}</h3>
-                <p className="mt-1.5 text-[14.5px] leading-relaxed text-ink-soft">{f.body}</p>
-              </div>
-            ))}
+          </ul>
+          <div className="mt-10">
+            <BetaForm />
           </div>
         </div>
       </section>
 
-      {/* ---------- Share your proof ---------- */}
+      {/* ---------- 6 · FAQ ---------- */}
       <section className="border-t border-line">
-        <div className="mx-auto w-full max-w-4xl px-5 py-20 sm:px-6">
-          <div className="grid items-center gap-10 sm:grid-cols-2">
-            <div>
-              <h2 className="font-display text-3xl font-semibold">Share your proof</h2>
-              <p className="mt-4 text-[15.5px] leading-relaxed text-ink-soft">
-                After a session, Daily Proof can generate an elegant proof card — practice,
-                duration, date, and a fitting line — designed like a certificate, not an
-                advertisement. One tap opens your share sheet for Instagram, Stories, X, Threads,
-                LinkedIn, or WhatsApp.
-              </p>
-              <p className="mt-3 text-[15.5px] leading-relaxed text-ink-soft">
-                Sharing is optional, always. The app never interrupts you, never asks twice, and
-                never posts anything on its own. The proof is for you first.
-              </p>
-            </div>
-            {/* Elegant card mockup, drawn in the product's own language */}
-            <div aria-hidden className="mx-auto w-full max-w-[300px]">
-              <div className="card rotate-1 p-7 text-center shadow-lg">
-                <p className="font-display text-[15px] font-semibold">
-                  <span className="wordmark-daily">Daily</span> Proof
-                  <span className="wordmark-dot">.</span>
-                </p>
-                <p className="mt-1 text-[9px] uppercase tracking-[0.2em] text-ink-faint">
-                  Proof of practice
-                </p>
-                <p className="mt-5 font-display text-2xl font-semibold">Deep work</p>
-                <p className="mt-2 font-display text-4xl font-semibold">52 min</p>
-                <p className="mt-2 text-[11px] text-ink-faint">Saturday, July 4</p>
-                <div className="mx-auto mt-4 h-1.5 w-1.5 rounded-full bg-ember" />
-                <p className="mt-3 font-display text-[12.5px] italic leading-relaxed text-ink-soft">
-                  &ldquo;Proof over promises.&rdquo;
-                </p>
-                <p className="mt-5 text-[10px] text-ink-faint">dailyproofhq.com</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ---------- Emotional: planned vs finished ---------- */}
-      <section className="border-t border-line">
-        <div className="mx-auto w-full max-w-2xl px-6 py-20 text-center sm:py-24">
-          <h2 className="mx-auto max-w-[22ch] font-display text-3xl font-semibold leading-snug sm:text-4xl">
-            Most people remember what they planned. Successful people remember what they
-            finished<span className="wordmark-dot">.</span>
-          </h2>
-          <p className="mx-auto mt-6 max-w-[44ch] text-[15.5px] leading-relaxed text-ink-soft">
-            A to-do list is a promise. Daily Proof is a receipt. When the session ends, what
-            remains isn&rsquo;t a checked box — it&rsquo;s a record: what you worked on, how long
-            you stayed, and what actually happened. Read it back in a month and you won&rsquo;t
-            wonder whether you&rsquo;re making progress. You&rsquo;ll have proof.
-          </p>
-        </div>
-      </section>
-
-      {/* ---------- Pricing ---------- */}
-      <section id="pricing" className="border-t border-line bg-surface2/40">
-        <div className="mx-auto w-full max-w-4xl px-5 py-20 sm:px-6">
-          <h2 className="text-center font-display text-3xl font-semibold">Simple pricing</h2>
-          <p className="mt-2 text-center text-[15px] text-ink-soft">
-            3-day trial · card required · then $7/month — or one payment, forever.
-          </p>
-          <div className="mx-auto mt-12 grid max-w-2xl items-start gap-4 sm:grid-cols-2">
-            <div className="card relative p-6 shadow-lg ring-1 ring-ember/40 sm:-mt-3 sm:pb-8">
-              <span className="absolute right-4 top-4 rounded-full bg-ember/10 px-2.5 py-0.5 text-[12px] font-medium text-ember-ink">
-                Recommended
-              </span>
-              <p className="text-sm font-medium text-ink-soft">Monthly</p>
-              <p className="mt-1 font-display text-3xl font-semibold">
-                $7<span className="text-base font-normal text-ink-faint">/month</span>
-              </p>
-              <p className="mt-2 text-[14px] text-ink-soft">
-                Includes 3-day trial. Card required. Then $7/month unless canceled.
-              </p>
-              <CheckoutButton
-                plan="monthly"
-                label="Start 3-day trial"
-                className="btn-primary mt-5 block w-full text-center"
-                fallbackHref="/pricing"
-              />
-            </div>
-            <div className="card relative p-6">
-              <span className="absolute right-4 top-4 rounded-full bg-ember/10 px-2.5 py-0.5 text-[12px] font-medium text-ember-ink">
-                Launch
-              </span>
-              <p className="text-sm font-medium text-ink-soft">Lifetime</p>
-              <p className="mt-1 font-display text-3xl font-semibold">
-                $70<span className="text-base font-normal text-ink-faint"> once</span>
-              </p>
-              <p className="mt-2 text-[14px] text-ink-soft">
-                Founding Member Lifetime. One purchase, yours forever.
-              </p>
-              <CheckoutButton
-                plan="lifetime"
-                label="Buy lifetime"
-                className="btn-quiet mt-5 block w-full text-center"
-                fallbackHref="/pricing"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ---------- FAQ ---------- */}
-      <section className="border-t border-line">
-        <div className="mx-auto w-full max-w-2xl px-5 py-20 sm:px-6">
+        <div className="mx-auto w-full max-w-2xl px-6 py-20 sm:py-24">
           <h2 className="text-center font-display text-3xl font-semibold">Questions, answered</h2>
           <div className="mt-10">
             <FaqList />
           </div>
           <div className="mt-12 text-center">
-            <Link href="/studio" className="btn-primary px-8 py-3 text-[16px]">
-              Begin your first page
-            </Link>
+            <a href="#beta" className="btn-primary px-8 py-3 text-[16px]">
+              Request Beta Invitation
+            </a>
           </div>
         </div>
       </section>

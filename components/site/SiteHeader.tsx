@@ -4,12 +4,21 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { Wordmark } from "@/components/Wordmark";
+import { BETA_MODE } from "@/lib/site";
 
-const NAV = [
-  { href: "/#how", label: "How it Works" },
-  { href: "/pricing", label: "Pricing" },
-  { href: "/support", label: "Support" },
-];
+const NAV = BETA_MODE
+  ? [
+      { href: "/#how", label: "How It Works" },
+      { href: "/support", label: "Support" },
+    ]
+  : [
+      { href: "/#how", label: "How It Works" },
+      { href: "/pricing", label: "Pricing" },
+      { href: "/support", label: "Support" },
+    ];
+const CTA = BETA_MODE
+  ? { href: "/#beta", label: "Request Invitation" }
+  : { href: "/studio", label: "Open the App" };
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
@@ -42,8 +51,8 @@ export function SiteHeader() {
               {l.label}
             </Link>
           ))}
-          <Link href="/studio" className="btn-quiet ml-1 px-4 py-2 text-[14px]">
-            Open the App
+          <Link href={CTA.href} className="btn-quiet ml-1 px-4 py-2 text-[14px]">
+            {CTA.label}
           </Link>
         </nav>
 
@@ -108,11 +117,11 @@ export function SiteHeader() {
             ))}
           </div>
           <Link
-            href="/studio"
+            href={CTA.href}
             onClick={() => setOpen(false)}
             className="btn-primary mt-auto w-full py-3.5 text-[16px]"
           >
-            Open the App
+            {CTA.label}
           </Link>
           </nav>
           </div>,

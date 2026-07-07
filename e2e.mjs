@@ -278,16 +278,13 @@ for (const asset of ["/manifest.webmanifest", "/sw.js", "/offline.html", "/icons
 
   const up = await newPage();
   await up.page.goto(BASE + "/upgrade");
-  await up.page.getByRole("button", { name: "Start 3-day trial" }).waitFor({ state: "visible" });
-  const configNote = await up.page
-    .getByText("Payments are not configured yet")
+  await up.page.waitForSelector("text=Daily Proof is in a private beta.");
+  check("Upgrade page shows beta notice", true);
+  const checkoutBtn = await up.page
+    .getByRole("button", { name: "Start 3-day trial" })
     .isVisible()
     .catch(() => false);
-  check("Config note hidden in production", !configNote);
-  await up.page.getByRole("button", { name: "Start 3-day trial" }).click();
-  await up.page.waitForSelector("text=Checkout is temporarily unavailable");
-  check("Unavailable checkout fails calmly in production", true);
-  await up.page.screenshot({ path: `${SHOTS}/16-upgrade.png` });
+  check("Public checkout hidden during beta", !checkoutBtn);
   await up.ctx.close();
 }
 
@@ -455,7 +452,7 @@ for (const asset of ["/manifest.webmanifest", "/sw.js", "/offline.html", "/icons
 {
   const pages = [
     ["/", "Collect proof that meaningful work"],
-    ["/pricing", "Simple pricing"],
+    ["/pricing", "Founding Beta"],
     ["/privacy", "Privacy Policy"],
     ["/terms", "Terms of Service"],
     ["/refunds", "Refund Policy"],
@@ -471,7 +468,7 @@ for (const asset of ["/manifest.webmanifest", "/sw.js", "/offline.html", "/icons
   // Footer legal links resolve
   await m.page.goto(BASE + "/");
   const footerLinks = await m.page.locator("footer a[href]").evaluateAll((as) => as.map((a) => a.getAttribute("href")));
-  check("Footer has all legal links", ["/privacy", "/terms", "/refunds", "/support", "/contact"].every((h) => footerLinks.includes(h)));
+  check("Footer has beta links", ["/privacy", "/support", "/#how"].every((h) => footerLinks.includes(h)));
   // SEO essentials on the landing page
   const og = await m.page.locator('meta[property="og:image"]').getAttribute("content");
   const tw = await m.page.locator('meta[name="twitter:card"]').getAttribute("content");
@@ -503,15 +500,15 @@ for (const asset of ["/manifest.webmanifest", "/sw.js", "/offline.html", "/icons
   );
   await burger.click();
   const menu = m.page.locator("#mobile-menu");
-  await menu.getByRole("link", { name: "Pricing" }).waitFor({ state: "visible" });
+  await menu.getByRole("link", { name: "Support" }).waitFor({ state: "visible" });
   check("Slide-in menu opens with nav items", true);
   check(
-    "Menu has Open the App",
-    await menu.getByRole("link", { name: "Open the App" }).isVisible()
+    "Menu has Request Invitation",
+    await menu.getByRole("link", { name: "Request Invitation" }).isVisible()
   );
   await m.page.screenshot({ path: `${SHOTS}/21-mobile-menu.png` });
-  await menu.getByRole("link", { name: "Pricing" }).click();
-  await m.page.waitForURL("**/pricing");
+  await menu.getByRole("link", { name: "Support" }).click();
+  await m.page.waitForURL("**/support");
   check("Menu link navigates and closes", true);
   await m.ctx.close();
 }
@@ -523,7 +520,7 @@ for (const [label, vp] of [
 ]) {
   const f = await newPage(vp);
   await f.page.goto(BASE + "/");
-  const cta = await f.page.getByRole("button", { name: "Start 3-day trial" }).first().boundingBox();
+  const cta = await f.page.getByRole("link", { name: "Request Beta Invitation" }).first().boundingBox();
   check(`Hero CTA above the fold (${label})`, !!cta && cta.y + cta.height <= vp.height);
   await f.ctx.close();
 }
@@ -621,19 +618,43 @@ for (const [label, vp] of [
   check("Portal route degrades without keys", portal.status() === 503);
   const c = await newPage();
   await c.page.goto(BASE + "/upgrade?canceled=1");
-  await c.page.waitForSelector("text=Checkout was cancelled");
-  check("Cancel page shows gentle note", true);
+  await c.page.waitForSelector("text=Daily Proof is in a private beta.");
+  check("Cancel URL shows beta notice during beta", true);
   await c.ctx.close();
 }
 
-// ---------- Hero CTA fallback without keys ----------
+// ---------- Hero CTA scrolls to the beta form ----------
 {
   const h = await newPage();
   await h.page.goto(BASE + "/");
-  await h.page.getByRole("button", { name: "Start 3-day trial" }).first().click();
-  await h.page.waitForURL("**/pricing");
-  check("Hero trial CTA falls back to pricing without keys", true);
+  await h.page.getByRole("link", { name: "Request Beta Invitation" }).first().click();
+  await h.page.waitForTimeout(600);
+  const form = await h.page.locator("#beta-email").boundingBox();
+  check("Hero CTA reveals the invitation form", !!form && form.y < 700);
   await h.ctx.close();
+}
+
+// ---------- Founding Beta form + Loops endpoint ----------
+{
+  const bad = await page.request.post(BASE + "/api/beta/request", { data: { email: "not-an-email" } });
+  check("Beta endpoint rejects invalid email", bad.status() === 400);
+  const nokey = await page.request.post(BASE + "/api/beta/request", { data: { email: "a@b.co" } });
+  check("Beta endpoint degrades without LOOPS_API_KEY", nokey.status() === 503);
+  const b = await newPage();
+  await b.page.goto(BASE + "/#beta");
+  await b.page.fill("#beta-email", "bad-address");
+  await b.page.getByRole("button", { name: "Request Beta Invitation" }).click();
+  await b.page.waitForSelector("text=That doesn't look like a valid email address.");
+  check("Form flags invalid email inline", true);
+  await b.page.fill("#beta-email", "tester@example.com");
+  await b.page.getByRole("button", { name: "Request Beta Invitation" }).click();
+  await b.page.waitForSelector("text=Something went wrong on our side");
+  check("Form fails calmly in production without key", true);
+  await b.ctx.close();
+  for (const shot of ["create", "studio", "focus", "finish", "book"]) {
+    const res = await page.request.get(BASE + `/screens/${shot}.png`);
+    check(`Screenshot asset ${shot}.png serves`, res.ok());
+  }
 }
 
 // ---------- Access guard: expired free user sees paywall ----------

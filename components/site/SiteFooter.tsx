@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Wordmark } from "@/components/Wordmark";
+import { BETA_MODE } from "@/lib/site";
 
 const COLUMNS = [
   {
@@ -22,7 +23,51 @@ const COLUMNS = [
   },
 ];
 
+const BETA_LINKS = [
+  { href: "/#how", label: "How It Works" },
+  { href: "/privacy", label: "Privacy" },
+  { href: "/support", label: "Support" },
+  { href: "https://dailyproofhq.com", label: "Mission Seventy" },
+];
+
+function BetaFooter() {
+  return (
+    <footer className="border-t border-line">
+      <div className="mx-auto w-full max-w-5xl px-6 py-12 text-center">
+        <Wordmark className="text-lg" />
+        <nav aria-label="Footer" className="mt-5 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+          {BETA_LINKS.map((l) =>
+            l.href.startsWith("http") ? (
+              <a
+                key={l.href}
+                href={l.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[14px] text-ink-soft transition-colors hover:text-ink"
+              >
+                {l.label}
+              </a>
+            ) : (
+              <Link
+                key={l.href}
+                href={l.href}
+                className="text-[14px] text-ink-soft transition-colors hover:text-ink"
+              >
+                {l.label}
+              </Link>
+            )
+          )}
+        </nav>
+        <p className="mt-6 text-[13px] text-ink-faint">
+          © {new Date().getFullYear()} Daily Proof · Local-first. Calm by design.
+        </p>
+      </div>
+    </footer>
+  );
+}
+
 export function SiteFooter() {
+  if (BETA_MODE) return <BetaFooter />;
   return (
     <footer className="border-t border-line">
       <div className="mx-auto w-full max-w-5xl px-6 py-14">

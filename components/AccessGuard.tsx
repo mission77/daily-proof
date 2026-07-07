@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { getAccessState, hasFullAccess, trialDaysLeft } from "@/lib/repos/access";
 import { Wordmark } from "@/components/Wordmark";
 import { PlanPicker } from "@/components/PlanPicker";
+import { BETA_MODE } from "@/lib/site";
 
 /** Guards the app for expired free users. Local-first today: the role lives
  *  in IndexedDB. The shape is ready for server verification later — swap the
@@ -51,9 +52,24 @@ export function AccessGuard({ children }: { children: React.ReactNode }) {
           </Link>{" "}
           anytime.
         </p>
-        <div className="mt-8 text-left">
-          <PlanPicker />
-        </div>
+        {BETA_MODE ? (
+          <div className="mt-8">
+            <p className="mx-auto max-w-md text-[15px] leading-relaxed text-ink-soft">
+              Daily Proof is in a private beta. If you have an access code, enter it in{" "}
+              <Link href="/settings" className="underline underline-offset-2">
+                Settings → Access
+              </Link>{" "}
+              — or request an invitation for the Founding Beta.
+            </p>
+            <Link href="/#beta" className="btn-primary mt-6 inline-flex px-7 py-3">
+              Request Beta Invitation
+            </Link>
+          </div>
+        ) : (
+          <div className="mt-8 text-left">
+            <PlanPicker />
+          </div>
+        )}
       </div>
     );
   }
