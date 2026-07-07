@@ -89,7 +89,7 @@ export function BetaForm() {
         </p>
       )}
       <p className="mt-4 text-center text-[12.5px] leading-relaxed text-ink-faint">
-        Your email is only used to send your beta invitation. Daily Proof itself requires no
+        Your email only used to send your early access invitation.. Daily Proof itself requires no
         account and does not track your work.
       </p>
     </div>
