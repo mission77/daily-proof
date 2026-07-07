@@ -121,24 +121,32 @@ export default function LandingPage() {
           Scroll to see how it works ↓
         </p>
       </section>
-
       {/* ---------- 2 · Why I Built Daily Proof ---------- */}
-      <section className="border-t border-line">
-        <div className="mx-auto grid w-full max-w-4xl items-center gap-12 px-6 py-20 sm:grid-cols-2 sm:py-28">
-          <Reveal>
-            <h2 className="font-display text-3xl font-semibold">Why I Built Daily Proof</h2>
-            <div className="mt-6 space-y-4 text-[16px] leading-relaxed text-ink-soft">
-              <p>I wanted three small things and couldn&rsquo;t find them in one place.</p>
-              <p>
-                A timer — because watching time pass keeps me honest while I work. One quiet place
-                to keep my reflections and thoughts. And proof of what I actually finished, instead
-                of another productivity system telling me what to do next.
-              </p>
-              <p>So I spent months building it.</p>
-              <p className="font-medium text-ink">
-                No social feed. No streak pressure. Just honest proof.
-              </p>
-            </div>
+<section className="border-t border-line">
+  <div className="mx-auto grid w-full max-w-4xl items-center gap-12 px-6 py-20 sm:grid-cols-2 sm:py-28">
+    <Reveal>
+      <h2 className="font-display text-3xl font-semibold">Why Daily Proof Exists</h2>
+
+      <div className="mt-6 space-y-4 text-[16px] leading-relaxed text-ink-soft">
+        <p>Most productivity tools create more noise instead of more focus.</p>
+
+        <p>
+          Sometimes all you need is one quiet place to focus, think, and keep
+          proof that meaningful work actually happened.
+        </p>
+
+        <p>
+          That is what I was looking for too. A timer that kept me honest, one
+          private place for my reflections, and a simple record of what I
+          actually finished.
+        </p>
+
+        <p>So I built Daily Proof.</p>
+
+        <p className="font-medium text-ink">
+          No social feed. No pressure. Just honest proof.
+        </p>
+      </div>
           </Reveal>
           <Reveal>
             <Screen src="/screens/studio.png" alt="The Daily Proof Studio with today's focus" />

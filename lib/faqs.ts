@@ -1,18 +1,18 @@
 export const FAQS = [
   {
-    q: "Why doesn't Daily Proof require an account?",
-    a: "Because your work belongs to you. Daily Proof is designed to work without collecting personal accounts or tracking your activity.",
+    q: "What is Daily Proof?",
+    a: "A private workspace for focused sessions, reflections, and proof of meaningful work. Everything stays on your device.",
   },
   {
-    q: "Where is my data stored?",
-    a: "Everything stays on your own device unless you choose to export a backup.",
+    q: "Who is Daily Proof for?",
+    a: "Daily Proof is for people who enjoy building, learning, writing, studying, creating, or simply want a calmer way to work. If you value focus over noise, you'll feel at home here.",
   },
   {
-    q: "Can I back everything up?",
-    a: "Yes. You can export your entire Proof Book and import it later whenever you want.",
+    q: "What do beta members receive?",
+    a: "Early access before public launch, direct communication with the founder, and the opportunity to help shape Daily Proof through feedback.",
   },
   {
-    q: "When does the beta open?",
-    a: "The first invitations will be sent over the coming days as Daily Proof is polished for its first public testers.",
+    q: "When will invitations be sent?",
+    a: "Invitations will be sent in small waves over the coming weeks as Daily Proof is polished and tested. Every invitation is intentional so feedback can directly improve the product.",
   },
 ];

@@ -27,7 +27,7 @@ const BETA_LINKS = [
   { href: "/#how", label: "How It Works" },
   { href: "/privacy", label: "Privacy" },
   { href: "/support", label: "Support" },
-  { href: "https://dailyproofhq.com", label: "Mission Seventy" },
+  { href: "https://dailyproofhq.com", label: "Daily Proof" },
 ];
 
 function BetaFooter() {
