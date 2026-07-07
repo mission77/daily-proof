@@ -80,7 +80,7 @@ export function BetaForm() {
           onClick={submit}
           disabled={phase === "sending" || email.trim().length === 0}
         >
-          {phase === "sending" ? "Sending…" : "Request Beta Invitation"}
+          {phase === "sending" ? "Sending…" : "Request Early Access"}
         </button>
       </div>
       {error && (

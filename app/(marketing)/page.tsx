@@ -110,7 +110,7 @@ export default function LandingPage() {
           </p>
           <div className="mx-auto mt-8 flex w-full max-w-sm flex-col items-center justify-center gap-3 sm:max-w-none sm:flex-row">
             <a href="#beta" className="btn-primary w-full px-8 py-4 text-[16px] sm:w-auto">
-              Request Beta Invitation
+              Request Early Access
             </a>
             <a href="#how" className="btn-quiet w-full px-8 py-4 text-[16px] sm:w-auto">
               See How It Works
@@ -235,7 +235,7 @@ export default function LandingPage() {
           </div>
           <div className="mt-12 text-center">
             <a href="#beta" className="btn-primary px-8 py-3 text-[16px]">
-              Request Beta Invitation
+              Request Early Access
             </a>
           </div>
         </div>

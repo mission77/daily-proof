@@ -20,7 +20,7 @@ export default function PricingPage() {
           members receive early access and founder pricing before the public launch.
         </p>
         <Link href="/#beta" className="btn-primary mt-8 inline-flex px-8 py-3.5 text-[16px]">
-          Request Beta Invitation
+          Request Early Access
         </Link>
       </div>
     );

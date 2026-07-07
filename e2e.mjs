@@ -503,8 +503,8 @@ for (const asset of ["/manifest.webmanifest", "/sw.js", "/offline.html", "/icons
   await menu.getByRole("link", { name: "Support" }).waitFor({ state: "visible" });
   check("Slide-in menu opens with nav items", true);
   check(
-    "Menu has Request Invitation",
-    await menu.getByRole("link", { name: "Request Invitation" }).isVisible()
+    "Menu has Request Early Access",
+    await menu.getByRole("link", { name: "Request Early Access" }).isVisible()
   );
   await m.page.screenshot({ path: `${SHOTS}/21-mobile-menu.png` });
   await menu.getByRole("link", { name: "Support" }).click();
@@ -520,7 +520,7 @@ for (const [label, vp] of [
 ]) {
   const f = await newPage(vp);
   await f.page.goto(BASE + "/");
-  const cta = await f.page.getByRole("link", { name: "Request Beta Invitation" }).first().boundingBox();
+  const cta = await f.page.getByRole("link", { name: "Request Early Access" }).first().boundingBox();
   check(`Hero CTA above the fold (${label})`, !!cta && cta.y + cta.height <= vp.height);
   await f.ctx.close();
 }
@@ -627,7 +627,7 @@ for (const [label, vp] of [
 {
   const h = await newPage();
   await h.page.goto(BASE + "/");
-  await h.page.getByRole("link", { name: "Request Beta Invitation" }).first().click();
+  await h.page.getByRole("link", { name: "Request Early Access" }).first().click();
   await h.page.waitForTimeout(600);
   const form = await h.page.locator("#beta-email").boundingBox();
   check("Hero CTA reveals the invitation form", !!form && form.y < 700);
@@ -643,11 +643,11 @@ for (const [label, vp] of [
   const b = await newPage();
   await b.page.goto(BASE + "/#beta");
   await b.page.fill("#beta-email", "bad-address");
-  await b.page.getByRole("button", { name: "Request Beta Invitation" }).click();
+  await b.page.getByRole("button", { name: "Request Early Access" }).click();
   await b.page.waitForSelector("text=That doesn't look like a valid email address.");
   check("Form flags invalid email inline", true);
   await b.page.fill("#beta-email", "tester@example.com");
-  await b.page.getByRole("button", { name: "Request Beta Invitation" }).click();
+  await b.page.getByRole("button", { name: "Request Early Access" }).click();
   await b.page.waitForSelector("text=Something went wrong on our side");
   check("Form fails calmly in production without key", true);
   await b.ctx.close();

@@ -59,10 +59,10 @@ export function AccessGuard({ children }: { children: React.ReactNode }) {
               <Link href="/settings" className="underline underline-offset-2">
                 Settings → Access
               </Link>{" "}
-              — or request an invitation for the Founding Beta.
+              — or request early access for the Founding Beta.
             </p>
             <Link href="/#beta" className="btn-primary mt-6 inline-flex px-7 py-3">
-              Request Beta Invitation
+              Request Early Access
             </Link>
           </div>
         ) : (

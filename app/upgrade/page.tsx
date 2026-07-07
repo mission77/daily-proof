@@ -32,10 +32,10 @@ export default function UpgradePage({
               <Link href="/settings" className="underline underline-offset-2">
                 Settings → Access
               </Link>
-              . Otherwise, request a Founding Beta invitation.
+              . Otherwise, request a Founding Beta Access.
             </p>
             <Link href="/#beta" className="btn-primary mt-7 inline-flex px-7 py-3 text-[16px]">
-              Request Beta Invitation
+              Request Early Access
             </Link>
           </div>
         ) : (

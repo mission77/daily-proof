@@ -17,7 +17,7 @@ const NAV = BETA_MODE
       { href: "/support", label: "Support" },
     ];
 const CTA = BETA_MODE
-  ? { href: "/#beta", label: "Request Invitation" }
+  ? { href: "/#beta", label: "Request Early Access" }
   : { href: "/studio", label: "Open the App" };
 
 export function SiteHeader() {
