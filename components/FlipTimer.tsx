@@ -47,7 +47,8 @@ export function FlipTimer({ elapsedMs }: { elapsedMs: number }) {
       className="flex items-center justify-center gap-1.5 sm:gap-2
         [--dw:2.7rem] [--dh:4rem] [--dfs:2.4rem]
         sm:[--dw:3.6rem] sm:[--dh:5.2rem] sm:[--dfs:3.2rem]
-        md:[--dw:4.4rem] md:[--dh:6.4rem] md:[--dfs:4rem]"
+        md:[--dw:4.4rem] md:[--dh:6.4rem] md:[--dfs:4rem]
+        lg:[--dw:5.2rem] lg:[--dh:7.4rem] lg:[--dfs:4.6rem]"
     >
       {groups.map((group, gi) => (
         <Fragment key={`g-${gi}`}>

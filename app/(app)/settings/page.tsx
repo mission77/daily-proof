@@ -14,13 +14,13 @@ import {
   restoreBackup,
 } from "@/lib/backup";
 import {
-  applyLicense,
   effectiveRole,
   getAccessState,
   roleLabel,
   setAccessRole,
   trialDaysLeft,
 } from "@/lib/repos/access";
+import { AccessCodeForm } from "@/components/AccessCodeForm";
 import { STORES, idbClear } from "@/lib/db";
 import { clearActiveSession } from "@/lib/repos/settings";
 import { createPractice } from "@/lib/repos/practices";
@@ -141,54 +141,7 @@ export default function SettingsPage() {
   }
 
   // ---------- Access code ----------
-  const [codeInput, setCodeInput] = useState("");
-  const [redeeming, setRedeeming] = useState(false);
-  const [codeError, setCodeError] = useState<string | null>(null);
   const [portalBusy, setPortalBusy] = useState(false);
-
-  async function redeemCode() {
-    const code = codeInput.trim();
-    if (!code || redeeming) return;
-    setRedeeming(true);
-    setCodeError(null);
-    try {
-      const res = await fetch("/api/license/validate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code }),
-      });
-      if (res.status === 503) {
-        setCodeError("Access codes aren't enabled on this deployment yet.");
-        return;
-      }
-      const data = await res.json();
-      if (!res.ok || !data.valid) {
-        const reasons: Record<string, string> = {
-          malformed: "That doesn't look like a Daily Proof code. Check for typos.",
-          invalid_signature: "This code isn't valid.",
-          expired: "This code has expired.",
-          exhausted: "This code has already been used the maximum number of times.",
-          revoked: "This code is no longer active.",
-          past_due: "This code is no longer active.",
-        };
-        setCodeError(reasons[data.reason] ?? "This code couldn't be validated.");
-        return;
-      }
-      const next = await applyLicense({
-        code: code.toUpperCase(),
-        role: data.role,
-        expiresAt: data.expiresAt ?? null,
-        validatedAt: new Date().toISOString(),
-      });
-      setAccess(next);
-      setCodeInput("");
-      toast(`Access updated: ${roleLabel(data.role)}`);
-    } catch {
-      setCodeError("Couldn't reach the server. Check your connection and try again.");
-    } finally {
-      setRedeeming(false);
-    }
-  }
 
   async function openBillingPortal() {
     if (!access?.stripeCustomerId || portalBusy) return;
@@ -213,8 +166,10 @@ export default function SettingsPage() {
   const currentRole = access ? effectiveRole(access) : null;
 
   return (
-    <div className="space-y-8">
-      <h1 className="font-display text-2xl font-semibold sm:text-3xl">Settings</h1>
+    // Desktop lays the setting cards out in two columns; below lg the
+    // original single column (space-y) is untouched.
+    <div className="space-y-8 lg:grid lg:grid-cols-2 lg:items-start lg:gap-8 lg:space-y-0">
+      <h1 className="font-display text-2xl font-semibold sm:text-3xl lg:col-span-2">Settings</h1>
 
       {/* ---------- Appearance ---------- */}
       <section aria-labelledby="s-appearance">
@@ -281,31 +236,14 @@ export default function SettingsPage() {
             <label htmlFor="s-code" className="text-[13.5px] font-medium text-ink-soft">
               Have an access code?
             </label>
-            <div className="mt-2 flex flex-col gap-2 sm:flex-row">
-              <input
-                id="s-code"
-                className="field flex-1 uppercase placeholder:normal-case"
-                placeholder="e.g. BETA-XXXXXXXXX-XXXXXXXXXX"
-                value={codeInput}
-                onChange={(e) => setCodeInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && redeemCode()}
-                autoCapitalize="characters"
-                autoComplete="off"
-                spellCheck={false}
+            <div className="mt-2">
+              <AccessCodeForm
+                onSuccess={(next, roleName) => {
+                  setAccess(next);
+                  toast(`Access updated: ${roleName}`);
+                }}
               />
-              <button
-                className="btn-quiet shrink-0"
-                onClick={redeemCode}
-                disabled={redeeming || codeInput.trim().length === 0}
-              >
-                {redeeming ? "Checking…" : "Redeem"}
-              </button>
             </div>
-            {codeError && (
-              <p className="mt-2 text-[13px] text-red-500" role="alert">
-                {codeError}
-              </p>
-            )}
             <p className="mt-2 text-[12.5px] text-ink-faint">
               Entering a new code replaces your current one. No account needed — the code is your key.
             </p>

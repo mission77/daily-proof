@@ -1,5 +1,7 @@
-// Access foundation only. No billing, no paywall enforcement yet.
-// Owner: permanent access. Lifetime: one-time purchase. Premium: monthly. Free: 3-day trial.
+// Access foundation. The app requires a valid access code: owner, lifetime,
+// premium, or beta. "free" is the codeless default state and grants nothing —
+// AccessGuard shows the lock screen until a code is redeemed. Trial fields
+// remain for the Stripe launch (trial handled by Stripe checkout later).
 
 import { STORES, idbGet, idbPut } from "@/lib/db";
 import { AccessRole, AccessState, StoredLicense, isAccessRecord, nowIso } from "@/lib/types";
@@ -79,15 +81,6 @@ export function trialDaysLeft(state: AccessState, now: Date = new Date()): numbe
   const elapsed = now.getTime() - new Date(state.trialStartedAt).getTime();
   const left = TRIAL_DAYS - elapsed / 86_400_000;
   return Math.max(0, Math.ceil(left));
-}
-
-/** Whether the app is usable. Never blocks anyone today: billing is not wired,
- *  so free users past trial still get access. Flip enforceTrial when payments land. */
-export function canUseApp(state: AccessState, opts: { enforceTrial?: boolean } = {}): boolean {
-  if (hasFullAccess(state)) return true;
-  if (!opts.enforceTrial) return true;
-  const left = trialDaysLeft(state);
-  return left === null || left > 0;
 }
 
 export function roleLabel(role: AccessRole): string {

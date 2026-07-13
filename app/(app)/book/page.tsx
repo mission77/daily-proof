@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SessionEntry } from "@/lib/types";
 import { deleteSession, editSessionNote, listSessionsForDay } from "@/lib/repos/sessions";
 import { formatDayHeading, formatDuration, formatTimeOfDay, isSameLocalDay } from "@/lib/time";
@@ -8,26 +8,65 @@ import { useToast } from "@/components/Toast";
 
 export default function BookPage() {
   const toast = useToast();
-  const [date, setDate] = useState(() => startOfDay(new Date()));
+  // The day is client state, set after mount. The page is statically
+  // prerendered, so computing "today" during render bakes the build machine's
+  // date into the HTML and every visit hydrates against a different heading —
+  // a guaranteed hydration failure on each Book load.
+  const [date, setDate] = useState<Date | null>(null);
   const [entries, setEntries] = useState<SessionEntry[] | null>(null);
   const [editing, setEditing] = useState<SessionEntry | null>(null);
-
-  const reload = useCallback(async (d: Date) => {
-    const list = await listSessionsForDay(d);
-    setEntries(list);
-  }, []);
+  // Bumping this re-reads the current day from IndexedDB (the one source of truth).
+  const [version, setVersion] = useState(0);
+  // True while the user is on "today" (the default view). Only then does the
+  // page follow the calendar when a new day starts.
+  const followToday = useRef(true);
 
   useEffect(() => {
-    reload(date);
-  }, [date, reload]);
+    setDate(startOfDay(new Date()));
+  }, []);
 
-  const isToday = isSameLocalDay(date, new Date());
+  // Single load path. The cancellation flag makes day changes race-free: a
+  // stale read that resolves after the user moved on can no longer overwrite
+  // the newer day's entries (which made saved sessions seem to vanish).
+  useEffect(() => {
+    if (!date) return;
+    let cancelled = false;
+    listSessionsForDay(date).then((list) => {
+      if (!cancelled) setEntries(list);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [date, version]);
+
+  // Long-lived tabs and the installed PWA: when the page returns to the
+  // foreground, re-read entries (they may have changed in another tab) and,
+  // if the user was viewing "today" and midnight passed, move to the new day.
+  useEffect(() => {
+    const onForeground = () => {
+      if (document.visibilityState !== "visible") return;
+      if (followToday.current) {
+        setDate((d) => (d === null || isSameLocalDay(d, new Date()) ? d : startOfDay(new Date())));
+      }
+      setVersion((v) => v + 1);
+    };
+    window.addEventListener("focus", onForeground);
+    document.addEventListener("visibilitychange", onForeground);
+    return () => {
+      window.removeEventListener("focus", onForeground);
+      document.removeEventListener("visibilitychange", onForeground);
+    };
+  }, []);
+
+  const isToday = date === null || isSameLocalDay(date, new Date());
 
   function go(delta: number) {
     setEntries(null);
     setDate((d) => {
+      if (d === null) return d;
       const next = new Date(d);
       next.setDate(d.getDate() + delta);
+      followToday.current = isSameLocalDay(next, new Date());
       return next;
     });
   }
@@ -36,7 +75,7 @@ export default function BookPage() {
     await deleteSession(entry.id);
     setEditing(null);
     toast("Proof deleted");
-    reload(date);
+    setVersion((v) => v + 1);
   }
 
   async function saveNote(entry: SessionEntry, notes: string) {
@@ -45,14 +84,16 @@ export default function BookPage() {
     if (updated && updated.noteEdited && updated.updatedAt !== entry.updatedAt) {
       toast("Note updated");
     }
-    await reload(date);
+    setVersion((v) => v + 1);
   }
 
   return (
     <div>
       {/* Page header: the date is the page */}
       <div className="flex items-center justify-between gap-3">
-        <h1 className="font-display text-xl font-semibold sm:text-2xl">{formatDayHeading(date)}</h1>
+        <h1 className="font-display text-xl font-semibold sm:text-2xl lg:text-3xl">
+          {date ? formatDayHeading(date) : " "}
+        </h1>
         <div className="flex shrink-0 gap-1.5">
           <button className="btn-quiet px-3.5 py-2" aria-label="Previous day" onClick={() => go(-1)}>
             ←

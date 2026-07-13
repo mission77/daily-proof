@@ -52,7 +52,7 @@ export default function PrivacyPage() {
         optional and this policy will be updated first.
       </p>
 
-      <h2 className="mt-10 font-display text-xl font-semibold">What we don't do</h2>
+      <h2 className="mt-10 font-display text-xl font-semibold">What we don&rsquo;t do</h2>
       <p className="mt-3 leading-relaxed text-ink-soft">
         We do not sell personal information. We do not use advertising
         trackers. We do not profile your behavior. Privacy is part of how Daily

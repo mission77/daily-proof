@@ -16,8 +16,19 @@ import { renderShareCard, shareCard } from "@/lib/sharecard";
 import { FlipTimer } from "@/components/FlipTimer";
 import { Wordmark } from "@/components/Wordmark";
 import { useToast } from "@/components/Toast";
+import { AccessGuard } from "@/components/AccessGuard";
 
+/** Focus lives outside the (app) shell for a chrome-free screen, so it needs
+ *  its own guard: sessions require a valid access code like the rest of the app. */
 export default function FocusPage() {
+  return (
+    <AccessGuard>
+      <FocusSession />
+    </AccessGuard>
+  );
+}
+
+function FocusSession() {
   const router = useRouter();
   const toast = useToast();
   const [session, setSession] = useState<ActiveSession | null | undefined>(undefined);
@@ -138,6 +149,10 @@ export default function FocusPage() {
       usesMeasurement && measurement.trim() !== "" ? Number(measurement) : undefined;
 
     const entry = await saveProof({
+      // Deterministic id: one active session yields one proof entry. If the
+      // steps after the save ever fail and the finish screen reappears,
+      // saving again overwrites this entry instead of duplicating it.
+      id: `${session.practiceId}@${session.startedAt}`,
       practiceId: session.practiceId,
       practiceNameSnapshot: liveName || session.practiceNameSnapshot,
       durationMs: duration,
@@ -148,8 +163,19 @@ export default function FocusPage() {
       startedAt: session.startedAt,
       completedAt: nowIso(),
     });
-    const quote = await pickQuote(entry.practiceNameSnapshot, practice?.description);
-    await clearActiveSession();
+    // The proof is saved; nothing decorative may undo that from the user's
+    // point of view. A failed quote or cleanup must still land on "saved".
+    let quote: Quote | null = null;
+    try {
+      quote = await pickQuote(entry.practiceNameSnapshot, practice?.description);
+    } catch {
+      /* quote is optional */
+    }
+    try {
+      await clearActiveSession();
+    } catch {
+      /* the deterministic id above keeps a re-save from duplicating */
+    }
     // Show the saved screen; the redirect effect stays quiet while savedEntry exists.
     setSavedEntry(entry);
     setSavedQuote(quote);
@@ -188,7 +214,7 @@ export default function FocusPage() {
   // ---------- Proof saved ----------
   if (savedEntry) {
     return (
-      <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col items-center justify-center px-5 py-10 text-center">
+      <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col items-center justify-center px-5 py-10 text-center lg:max-w-lg">
         <Wordmark className="text-lg" />
         <div className="mt-8 flex h-12 w-12 items-center justify-center rounded-full bg-ember/10 text-ember-ink">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -232,12 +258,12 @@ export default function FocusPage() {
   // ---------- Finish screen ----------
   if (session.status === "finishing") {
     return (
-      <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col justify-center px-5 py-10">
+      <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col justify-center px-5 py-10 lg:max-w-xl">
         <p className="text-xs font-medium uppercase tracking-[0.14em] text-ink-faint">Session finished</p>
         <h1 className="mt-1 font-display text-2xl font-semibold">{liveName}</h1>
         <p className="mt-1 text-ink-soft tabular-nums">{formatFinished(elapsed)}</p>
 
-        <div className="card mt-6 space-y-5 p-5">
+        <div className="card mt-6 space-y-5 p-5 lg:p-7">
           <fieldset>
             <legend className="mb-2 text-sm font-medium text-ink-soft">Completed what you intended?</legend>
             <div className="grid grid-cols-2 gap-2" role="radiogroup">
@@ -312,7 +338,7 @@ export default function FocusPage() {
     <div className="flex min-h-dvh flex-col items-center justify-center px-5 py-10">
       {/* Persistent branding: quiet, above the work, never competing with it. */}
       <Wordmark className="text-base opacity-80" />
-      <p className="mt-3 font-display text-xl font-medium text-ink-soft sm:text-2xl">{liveName}</p>
+      <p className="mt-3 font-display text-xl font-medium text-ink-soft sm:text-2xl lg:text-3xl">{liveName}</p>
 
       <div className="mt-8">
         <FlipTimer elapsedMs={elapsed} />
@@ -327,7 +353,7 @@ export default function FocusPage() {
         Paused
       </p>
 
-      <div className="mt-8 flex w-full max-w-xs flex-col items-center gap-3">
+      <div className="mt-8 flex w-full max-w-xs flex-col items-center gap-3 lg:max-w-sm">
         <button className="btn-primary w-full" onClick={finish}>
           Finish
         </button>

@@ -63,6 +63,10 @@ export default function StudioPage() {
   const archivedList = practices.filter((p) => p.archived);
   const focus = activeList.find((p) => p.id === focusId) ?? activeList[0];
   const others = activeList.filter((p) => p.id !== focus?.id);
+  // Desktop only: when there is a practice list, it sits beside the focus
+  // card instead of below it. DOM order is unchanged, so phones and tablets
+  // render exactly as before.
+  const hasSideColumn = others.length > 0 || archivedList.length > 0;
 
   async function startSession(practice: Practice) {
     // A session already in progress takes priority — return to it, never overwrite it.
@@ -166,14 +170,21 @@ export default function StudioPage() {
         What deserves your attention right&nbsp;now?
       </h1>
 
+      <div
+        className={
+          hasSideColumn
+            ? "lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(320px,400px)] lg:items-start lg:gap-x-10"
+            : ""
+        }
+      >
       {/* ---------- Today's Focus ---------- */}
-      <section className="mt-6" aria-labelledby="focus-heading">
+      <section className="mt-6 lg:col-start-1 lg:row-start-1" aria-labelledby="focus-heading">
         <h2 id="focus-heading" className="text-xs font-medium uppercase tracking-[0.14em] text-ink-faint">
           Today&rsquo;s focus
         </h2>
 
         {focus ? (
-          <div className="card mt-2.5 p-6 sm:p-8">
+          <div className="card mt-2.5 p-6 sm:p-8 lg:p-10">
             <div className="flex items-start justify-between gap-3">
               <p className="font-display text-2xl font-semibold sm:text-[28px]">{focus.name}</p>
               {active && (
@@ -226,8 +237,11 @@ export default function StudioPage() {
       </section>
 
       {/* ---------- Other Practices ---------- */}
-      {(others.length > 0 || archivedList.length > 0) && (
-        <section className="mt-8" aria-labelledby="others-heading">
+      {hasSideColumn && (
+        <section
+          className="mt-8 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:mt-6"
+          aria-labelledby="others-heading"
+        >
           <h2 id="others-heading" className="text-xs font-medium uppercase tracking-[0.14em] text-ink-faint">
             Other practices
           </h2>
@@ -290,7 +304,7 @@ export default function StudioPage() {
       )}
 
       {/* ---------- New Practice / edit focus ---------- */}
-      <section className="mt-8 flex flex-wrap gap-2">
+      <section className="mt-8 flex flex-wrap gap-2 lg:col-start-1 lg:row-start-2">
         {focus && (
           <>
             <button className="btn-quiet" onClick={() => setFormTarget("new")}>
@@ -305,6 +319,7 @@ export default function StudioPage() {
           </>
         )}
       </section>
+      </div>
 
       {formTarget && (
         <PracticeForm

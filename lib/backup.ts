@@ -50,7 +50,9 @@ export function backupFilename(date: Date = new Date()): string {
 export class BackupValidationError extends Error {}
 
 const EVIDENCE = new Set(["timer", "notes", "measurement"]);
-const ROLES = new Set(["owner", "lifetime", "premium", "free"]);
+// Every AccessRole must be listed: a backup exported under any role has to
+// import again. "beta" missing here rejected every beta user's backup.
+const ROLES = new Set(["owner", "lifetime", "premium", "beta", "free"]);
 
 function fail(reason: string): never {
   throw new BackupValidationError(reason);
@@ -136,7 +138,7 @@ function validateSession(s: unknown, i: number): void {
 
 function validateAccess(a: unknown): void {
   if (!isRecord(a)) fail('"access" is not an object.');
-  if (!ROLES.has(a.role as string)) fail('"access.role" must be one of: owner, lifetime, premium, free.');
+  if (!ROLES.has(a.role as string)) fail('"access.role" must be one of: owner, lifetime, premium, beta, free.');
 }
 
 export function previewBackup(b: BackupFile): BackupPreview {

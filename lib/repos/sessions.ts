@@ -2,6 +2,8 @@ import { STORES, idbDelete, idbGet, idbGetAll, idbPut } from "@/lib/db";
 import { SessionEntry, isSessionRecord, newId, nowIso } from "@/lib/types";
 
 export interface SaveProofInput {
+  /** Optional stable id. Passing the same id twice overwrites (idempotent save). */
+  id?: string;
   practiceId: string;
   practiceNameSnapshot: string;
   durationMs: number;
@@ -15,7 +17,7 @@ export interface SaveProofInput {
 
 export async function saveProof(input: SaveProofInput): Promise<SessionEntry> {
   const entry: SessionEntry = {
-    id: newId(),
+    id: input.id ?? newId(),
     practiceId: input.practiceId,
     practiceNameSnapshot: input.practiceNameSnapshot,
     durationMs: Math.max(0, Math.round(input.durationMs)),
