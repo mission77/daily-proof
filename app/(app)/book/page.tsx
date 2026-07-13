@@ -91,7 +91,7 @@ export default function BookPage() {
     <div>
       {/* Page header: the date is the page */}
       <div className="flex items-center justify-between gap-3">
-        <h1 className="font-display text-xl font-semibold sm:text-2xl lg:text-3xl">
+        <h1 className="font-display text-[26px] font-semibold leading-tight sm:text-3xl">
           {date ? formatDayHeading(date) : " "}
         </h1>
         <div className="flex shrink-0 gap-1.5">
@@ -126,21 +126,23 @@ export default function BookPage() {
       )}
 
       {entries !== null && entries.length > 0 && (
-        <ul className="card mt-5 divide-y divide-line">
+        <ul className="card mt-6 divide-y divide-line">
           {entries.map((e) => (
             <li key={e.id}>
+              {/* A journal entry, not a database row: the practice name leads,
+                  the metadata recedes, the reflection gets room to breathe. */}
               <button
-                className="block w-full px-4 py-3.5 text-left transition-colors hover:bg-surface2/60"
+                className="block w-full px-5 py-5 text-left transition-colors hover:bg-surface2/60 sm:px-6"
                 onClick={() => setEditing(e)}
                 aria-label={`Edit note for ${e.practiceNameSnapshot}`}
               >
                 <div className="flex items-baseline justify-between gap-3">
-                  <span className="truncate text-[15px] font-semibold">{e.practiceNameSnapshot}</span>
+                  <span className="truncate text-[17px] font-semibold">{e.practiceNameSnapshot}</span>
                   <span className="shrink-0 text-[13px] tabular-nums text-ink-faint">
                     {formatTimeOfDay(e.completedAt)}
                   </span>
                 </div>
-                <div className="mt-1 flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-[13px] text-ink-soft">
+                <div className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-[13px] text-ink-faint">
                   <span className="tabular-nums">{formatDuration(e.durationMs)}</span>
                   <span aria-hidden>·</span>
                   <span>{e.completed ? "Completed" : "Ended early"}</span>
@@ -156,11 +158,15 @@ export default function BookPage() {
                   {e.noteEdited && (
                     <>
                       <span aria-hidden>·</span>
-                      <span className="text-ink-faint">Edited</span>
+                      <span>Edited</span>
                     </>
                   )}
                 </div>
-                {e.notes && <p className="mt-1.5 line-clamp-2 text-[14px] text-ink-soft">{e.notes}</p>}
+                {e.notes && (
+                  <p className="mt-3 line-clamp-3 max-w-prose text-[15px] leading-relaxed text-ink-soft">
+                    {e.notes}
+                  </p>
+                )}
               </button>
             </li>
           ))}

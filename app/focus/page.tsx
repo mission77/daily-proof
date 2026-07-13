@@ -320,7 +320,7 @@ function FocusSession() {
           )}
         </div>
 
-        <button className="btn-primary mt-5 w-full py-3.5 text-[16px]" onClick={handleSaveProof} disabled={saving}>
+        <button className="btn-primary mt-5 w-full" onClick={handleSaveProof} disabled={saving}>
           {saving ? "Saving\u2026" : "Save proof"}
         </button>
         <button className="btn-ghost mx-auto mt-3" onClick={() => setConfirmCancel(true)}>

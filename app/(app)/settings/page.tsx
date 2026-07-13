@@ -168,8 +168,10 @@ export default function SettingsPage() {
   return (
     // Desktop lays the setting cards out in two columns; below lg the
     // original single column (space-y) is untouched.
-    <div className="space-y-8 lg:grid lg:grid-cols-2 lg:items-start lg:gap-8 lg:space-y-0">
-      <h1 className="font-display text-2xl font-semibold sm:text-3xl lg:col-span-2">Settings</h1>
+    <div className="space-y-9 lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-8 lg:gap-y-10 lg:space-y-0">
+      <h1 className="font-display text-[26px] font-semibold leading-tight sm:text-3xl lg:col-span-2">
+        Settings
+      </h1>
 
       {/* ---------- Appearance ---------- */}
       <section aria-labelledby="s-appearance">
@@ -193,20 +195,6 @@ export default function SettingsPage() {
               </button>
             );
           })}
-        </div>
-      </section>
-
-      {/* ---------- Privacy ---------- */}
-      <section aria-labelledby="s-privacy">
-        <h2 id="s-privacy" className="text-xs font-medium uppercase tracking-[0.14em] text-ink-faint">
-          Privacy
-        </h2>
-        <div className="card mt-2.5 p-5">
-          <p className="text-[15px]">Your proof never leaves this device.</p>
-          <p className="mt-1.5 text-[14px] text-ink-soft">
-            Everything is stored locally in your browser. There is no account, no server, and no
-            tracking. The only copy that exists elsewhere is the one you export yourself.
-          </p>
         </div>
       </section>
 
@@ -284,19 +272,35 @@ export default function SettingsPage() {
         </div>
       </section>
 
+      {/* ---------- Privacy ---------- */}
+      <section aria-labelledby="s-privacy">
+        <h2 id="s-privacy" className="text-xs font-medium uppercase tracking-[0.14em] text-ink-faint">
+          Privacy
+        </h2>
+        <div className="card mt-2.5 p-5">
+          <p className="text-[15px]">Your proof never leaves this device.</p>
+          <p className="mt-1.5 text-[14px] text-ink-soft">
+            Everything is stored locally in your browser. There is no account, no server, and no
+            tracking. The only copy that exists elsewhere is the one you export yourself.
+          </p>
+        </div>
+      </section>
+
       {/* ---------- About ---------- */}
       <section aria-labelledby="s-about">
         <h2 id="s-about" className="text-xs font-medium uppercase tracking-[0.14em] text-ink-faint">
           About
         </h2>
-        <div className="card mt-2.5 p-5">
-          <p className="font-display text-lg font-semibold">
-            <span className="wordmark-daily">Daily</span> Proof<span className="wordmark-dot">.</span>
-          </p>
-          <p className="mt-1 text-[14px] text-ink-soft">
+        <div className="card mt-2.5 p-4">
+          <div className="flex items-baseline justify-between gap-3">
+            <p className="font-display text-lg font-semibold">
+              <span className="wordmark-daily">Daily</span> Proof<span className="wordmark-dot">.</span>
+            </p>
+          </div>
+          <p className="mt-0.5 text-[14px] text-ink-soft">
             Collect proof of meaningful work. Not streaks, not points — proof.
           </p>
-          <div className="mt-3 flex items-center justify-between text-[13px] text-ink-faint">
+          <div className="mt-2.5 flex items-center justify-between text-[13px] text-ink-faint">
             <span>Version 1.0.0</span>
             {access && (
               <span>
@@ -313,13 +317,18 @@ export default function SettingsPage() {
         </div>
       </section>
 
-      {/* ---------- Developer (development builds only) ---------- */}
+      {/* ---------- Developer (development builds only) ----------
+          Deliberately quieter than the real settings: dashed hairline, tinted
+          background, smaller heading. It should read as an advanced area. */}
       {isDev && (
-        <section aria-labelledby="s-dev">
-          <h2 id="s-dev" className="text-xs font-medium uppercase tracking-[0.14em] text-ink-faint">
+        <section aria-labelledby="s-dev" className="lg:col-span-2">
+          <h2
+            id="s-dev"
+            className="text-[11px] font-medium uppercase tracking-[0.14em] text-ink-faint/80"
+          >
             Developer
           </h2>
-          <div className="card mt-2.5 space-y-4 p-5">
+          <div className="mt-2.5 space-y-4 rounded-2xl border border-dashed border-line/70 bg-surface2/40 p-4">
             <div>
               <p className="text-sm font-medium text-ink-soft">Access role</p>
               <div className="mt-2 flex flex-wrap gap-2">

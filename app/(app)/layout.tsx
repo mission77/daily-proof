@@ -17,7 +17,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-dvh flex flex-col">
       <header className="sticky top-0 z-40 border-b border-line bg-bg/85 backdrop-blur">
-        <div className="mx-auto flex h-14 w-full max-w-3xl items-center justify-between px-4 sm:px-6 lg:h-16 lg:max-w-6xl lg:px-10">
+        <div className="mx-auto flex h-14 w-full max-w-3xl items-center justify-between px-4 sm:px-6 lg:h-16 lg:max-w-7xl lg:px-10">
           <Link href="/studio" className="rounded-md" aria-label="Daily Proof — Studio">
             <Wordmark className="text-xl" />
           </Link>
@@ -42,8 +42,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       </header>
 
       {/* Desktop (lg+) widens the workspace to a real desktop canvas; phones
-          and tablets keep the original single-column measure. */}
-      <main className="mx-auto w-full max-w-3xl flex-1 px-4 pb-24 pt-6 sm:px-6 sm:pb-12 lg:max-w-6xl lg:px-10 lg:pt-8">
+          and tablets keep the original single-column measure. The app-surface
+          class quiets card outlines inside the workspace: hierarchy comes
+          from type and spacing, not borders (see PRODUCT.md design language). */}
+      <main className="app-surface mx-auto w-full max-w-3xl flex-1 px-4 pb-24 pt-6 sm:px-6 sm:pb-12 lg:max-w-7xl lg:px-10 lg:pt-8">
         <AccessGuard>{children}</AccessGuard>
       </main>
 

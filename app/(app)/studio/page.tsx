@@ -173,7 +173,7 @@ export default function StudioPage() {
       <div
         className={
           hasSideColumn
-            ? "lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(320px,400px)] lg:items-start lg:gap-x-10"
+            ? "lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(340px,420px)] lg:gap-x-10"
             : ""
         }
       >
@@ -184,7 +184,7 @@ export default function StudioPage() {
         </h2>
 
         {focus ? (
-          <div className="card mt-2.5 p-6 sm:p-8 lg:p-10">
+          <div className="card mt-2.5 p-6 sm:p-8">
             <div className="flex items-start justify-between gap-3">
               <p className="font-display text-2xl font-semibold sm:text-[28px]">{focus.name}</p>
               {active && (
@@ -199,7 +199,7 @@ export default function StudioPage() {
               {focus.evidenceTypes.map((t) => EVIDENCE_LABEL[t]).join(" · ")}
               {focus.measurementUnit ? ` (${focus.measurementUnit})` : ""}
             </p>
-            <div className="mt-6">
+            <div className="mt-5">
               {active ? (
                 <button className="btn-primary w-full sm:w-auto" onClick={() => router.push("/focus")}>
                   Return to session
@@ -239,13 +239,15 @@ export default function StudioPage() {
       {/* ---------- Other Practices ---------- */}
       {hasSideColumn && (
         <section
-          className="mt-8 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:mt-6"
+          className="mt-8 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:mt-6 lg:flex lg:flex-col"
           aria-labelledby="others-heading"
         >
           <h2 id="others-heading" className="text-xs font-medium uppercase tracking-[0.14em] text-ink-faint">
             Other practices
           </h2>
-          <ul className="card mt-2.5 divide-y divide-line">
+          {/* flex-1 stretches the card to match the focus column, so both
+              columns read as one aligned desktop workspace. */}
+          <ul className="card mt-2.5 divide-y divide-line lg:flex-1">
             {others.map((p, i) => (
               <li key={p.id} className="flex items-center gap-2 px-4 py-3">
                 <button
@@ -303,17 +305,20 @@ export default function StudioPage() {
         </section>
       )}
 
-      {/* ---------- New Practice / edit focus ---------- */}
-      <section className="mt-8 flex flex-wrap gap-2 lg:col-start-1 lg:row-start-2">
+      {/* ---------- Toolbar: practice actions ---------- */}
+      <section
+        className="mt-8 flex flex-wrap items-center gap-2 self-start lg:col-start-1 lg:row-start-2 lg:mt-4"
+        aria-label="Practice actions"
+      >
         {focus && (
           <>
             <button className="btn-quiet" onClick={() => setFormTarget("new")}>
               New practice
             </button>
-            <button className="btn-ghost" onClick={() => setFormTarget(focus)}>
+            <button className="btn-quiet" onClick={() => setFormTarget(focus)}>
               Edit focus
             </button>
-            <button className="btn-ghost" onClick={() => handleArchiveToggle(focus)}>
+            <button className="btn-quiet" onClick={() => handleArchiveToggle(focus)}>
               Archive focus
             </button>
           </>

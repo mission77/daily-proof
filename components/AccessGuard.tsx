@@ -64,7 +64,7 @@ export function AccessGuard({ children }: { children: React.ReactNode }) {
               <p className="mx-auto max-w-md text-[14px] leading-relaxed text-ink-faint">
                 No code yet? Request early access for the Founding Beta.
               </p>
-              <Link href="/#beta" className="btn-primary mt-4 inline-flex px-7 py-3">
+              <Link href="/#beta" className="btn-primary mt-4">
                 Request Early Access
               </Link>
             </div>

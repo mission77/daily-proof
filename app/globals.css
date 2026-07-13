@@ -158,6 +158,12 @@ body {
   transition: box-shadow 200ms ease-out, border-color 200ms ease-out;
 }
 
+/* App workspace (Studio, Book, Settings): outlines stay quiet so type and
+   whitespace carry the hierarchy. Marketing pages keep the default card. */
+.app-surface .card {
+  border-color: hsl(var(--line) / 0.65);
+}
+
 /* ---------- Inputs ---------- */
 
 .field {
