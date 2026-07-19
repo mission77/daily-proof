@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "code:owner": "node scripts/generate-codes.mjs --role owner",
+    "code:beta": "node scripts/generate-codes.mjs --role beta --days 60",
+    "code:lifetime": "node scripts/generate-codes.mjs --role lifetime",
+    "code:premium": "node scripts/generate-codes.mjs --role premium"
   },
   "dependencies": {
     "@fontsource-variable/fraunces": "^5.2.9",
