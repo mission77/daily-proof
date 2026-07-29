@@ -21,5 +21,5 @@ export async function POST(req: NextRequest) {
   if (plan !== "monthly" && plan !== "lifetime") {
     return NextResponse.json({ error: "invalid_plan" }, { status: 400 });
   }
-  return createCheckoutResponse(plan);
+  return createCheckoutResponse(plan, req);
 }

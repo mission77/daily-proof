@@ -1,10 +1,15 @@
 // Shared Checkout session creation used by /api/checkout (legacy) and the
 // named routes /api/stripe/checkout and /api/stripe/lifetime.
 
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getStripe, priceIdForPlan, readStripeEnv, type Plan } from "@/lib/stripe/server";
+import { clientKey, rateLimit } from "@/lib/rateLimit";
 
-export async function createCheckoutResponse(plan: Plan): Promise<NextResponse> {
+export async function createCheckoutResponse(plan: Plan, req: NextRequest): Promise<NextResponse> {
+  if (!rateLimit(`checkout-create:${clientKey(req)}`, 10, 60_000)) {
+    return NextResponse.json({ error: "rate_limited" }, { status: 429 });
+  }
+
   const env = readStripeEnv();
   if (!env) {
     return NextResponse.json(
@@ -19,7 +24,7 @@ export async function createCheckoutResponse(plan: Plan): Promise<NextResponse> 
       line_items: [{ price: priceIdForPlan(env, plan), quantity: 1 }],
       // Card collected up front; billing starts automatically after 3 days.
       ...(plan === "monthly" ? { subscription_data: { trial_period_days: 3 } } : {}),
-      success_url: `${env.appUrl}/upgrade/success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${env.appUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${env.appUrl}/upgrade?canceled=1`,
       metadata: { plan },
       allow_promotion_codes: true,

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { SUPPORT_EMAIL } from "@/lib/site";
 
 type Plan = "monthly" | "lifetime";
 const IS_DEV = process.env.NODE_ENV === "development";
@@ -97,6 +98,14 @@ export function PlanPicker() {
           {error}
         </p>
       )}
+      <p className="mt-5 text-center text-[13px] leading-relaxed text-ink-faint">
+        Your proof stays on this device — nothing syncs automatically. Cancel anytime from
+        Settings. Questions?{" "}
+        <a className="underline underline-offset-2 hover:text-ink" href={`mailto:${SUPPORT_EMAIL}`}>
+          {SUPPORT_EMAIL}
+        </a>
+        .
+      </p>
     </div>
   );
 }

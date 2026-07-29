@@ -1,3 +1,10 @@
 node_modules/
 .next/
 tsconfig.tsbuildinfo
+test-results/
+playwright-report/
+blob-report/
+
+# Local environment secrets (LICENSE_SIGNING_SECRET, Stripe keys, etc.) —
+# never committed. See .env.example for the variables to fill in.
+.env*.local

@@ -1,5 +1,5 @@
 import { STORES, idbDelete, idbGet, idbGetAll, idbPut } from "@/lib/db";
-import { SessionEntry, isSessionRecord, newId, nowIso } from "@/lib/types";
+import { SessionEntry, SessionMode, isSessionRecord, newId, nowIso } from "@/lib/types";
 
 export interface SaveProofInput {
   /** Optional stable id. Passing the same id twice overwrites (idempotent save). */
@@ -13,6 +13,9 @@ export interface SaveProofInput {
   notes?: string;
   startedAt: string;
   completedAt: string;
+  /** Absent = Stopwatch. */
+  mode?: SessionMode;
+  plannedDurationMs?: number;
 }
 
 export async function saveProof(input: SaveProofInput): Promise<SessionEntry> {
@@ -30,6 +33,8 @@ export async function saveProof(input: SaveProofInput): Promise<SessionEntry> {
     createdAt: nowIso(),
     updatedAt: nowIso(),
     noteEdited: false,
+    mode: input.mode,
+    plannedDurationMs: input.mode === "timer" ? input.plannedDurationMs : undefined,
   };
   await idbPut(STORES.sessions, entry);
   return entry;

@@ -107,3 +107,17 @@ export function verifyCode(code: string, secret: string): VerifyResult {
   if (expiresAt && expiresAt.getTime() < Date.now()) return { ok: false, reason: "expired" };
   return { ok: true, license: { role, expiresAt: expiresAt ? expiresAt.toISOString() : null, codeId: payload } };
 }
+
+/** Verifies against a list of keys (current + any retired ones) so a signing
+ *  key can rotate without invalidating codes signed under the old key. Tries
+ *  each in order and returns on the first success; otherwise returns the
+ *  last failure (malformed input fails identically under every key, so the
+ *  reason returned is still meaningful). */
+export function verifyCodeWithRotation(code: string, secrets: string[]): VerifyResult {
+  let last: VerifyResult = { ok: false, reason: "malformed" };
+  for (const secret of secrets) {
+    last = verifyCode(code, secret);
+    if (last.ok) return last;
+  }
+  return last;
+}

@@ -40,6 +40,7 @@ export function AccessCodeForm({
           exhausted: "This code has already been used the maximum number of times.",
           revoked: "This code is no longer active.",
           past_due: "This code is no longer active.",
+          rate_limited: "Too many attempts — please wait a moment and try again.",
         };
         setCodeError(reasons[data.reason] ?? "This code couldn't be validated.");
         return;

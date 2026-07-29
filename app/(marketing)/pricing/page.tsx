@@ -36,13 +36,6 @@ export default function PricingPage() {
       <div className="mt-10">
         <PlanPicker />
       </div>
-      <p className="mt-8 text-center text-[13.5px] text-ink-faint">
-        Prefer to try first?{" "}
-        <Link href="/studio" className="underline underline-offset-2 hover:text-ink">
-          Open the app
-        </Link>{" "}
-        and begin your trial. Your proof stays on your device either way.
-      </p>
     </div>
   );
 }

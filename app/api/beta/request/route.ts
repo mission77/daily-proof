@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { clientKey, rateLimit } from "@/lib/rateLimit";
 
 export const runtime = "nodejs";
 
@@ -9,6 +10,10 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
  *  never reaches the client. The email is used for the invitation only — no
  *  analytics, no newsletter, no tracking. */
 export async function POST(req: NextRequest) {
+  if (!rateLimit(`beta-request:${clientKey(req)}`, 5, 60_000)) {
+    return NextResponse.json({ error: "rate_limited" }, { status: 429 });
+  }
+
   let email: unknown;
   try {
     email = (await req.json())?.email;

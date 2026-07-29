@@ -27,12 +27,27 @@ export function PracticeForm({ practice, onSave, onClose }: PracticeFormProps) {
   const [saving, setSaving] = useState(false);
   const nameRef = useRef<HTMLInputElement>(null);
 
+  // An accidental backdrop tap or Escape must never silently throw away a
+  // practice someone was in the middle of naming — only the explicit Cancel
+  // button discards unsaved changes once there are any.
+  const initialTypes = Array.from(practice?.evidenceTypes ?? ["timer"]).sort().join(",");
+  const dirty =
+    name !== (practice?.name ?? "") ||
+    description !== (practice?.description ?? "") ||
+    unit !== (practice?.measurementUnit ?? "") ||
+    Array.from(types).sort().join(",") !== initialTypes;
+
   useEffect(() => {
     nameRef.current?.focus();
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+  }, []);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && !dirty) onClose();
+    };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
+  }, [onClose, dirty]);
 
   function toggle(t: EvidenceType) {
     setTypes((prev) => {
@@ -64,7 +79,7 @@ export function PracticeForm({ practice, onSave, onClose }: PracticeFormProps) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-0 sm:items-center sm:p-6"
-      onMouseDown={(e) => e.target === e.currentTarget && onClose()}
+      onMouseDown={(e) => e.target === e.currentTarget && !dirty && onClose()}
       role="dialog"
       aria-modal="true"
       aria-label={practice ? "Edit practice" : "New practice"}

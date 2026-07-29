@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyCode } from "@/lib/license/codes";
+import { verifyCodeWithRotation } from "@/lib/license/codes";
 import { checkAndConsume, storeConfigured } from "@/lib/license/store";
+import { verificationSecrets } from "@/lib/license/secrets";
+import { clientKey, rateLimit } from "@/lib/rateLimit";
 
 export const runtime = "nodejs";
 
@@ -8,8 +10,12 @@ export const runtime = "nodejs";
  *  Validates an access code. No accounts, no login: a valid code returns the
  *  role and expiry, which the client stores locally. */
 export async function POST(req: NextRequest) {
-  const secret = process.env.LICENSE_SIGNING_SECRET;
-  if (!secret) {
+  if (!rateLimit(`license-validate:${clientKey(req)}`, 20, 60_000)) {
+    return NextResponse.json({ valid: false, reason: "rate_limited" }, { status: 429 });
+  }
+
+  const secrets = verificationSecrets();
+  if (secrets.length === 0) {
     return NextResponse.json({ error: "licenses_not_configured" }, { status: 503 });
   }
 
@@ -23,7 +29,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ valid: false, reason: "malformed" }, { status: 200 });
   }
 
-  const result = verifyCode(code, secret);
+  // Tries the current signing key first, then any retired ones — a code
+  // signed before a key rotation must keep validating.
+  const result = verifyCodeWithRotation(code, secrets);
   if (!result.ok) {
     return NextResponse.json({ valid: false, reason: result.reason }, { status: 200 });
   }

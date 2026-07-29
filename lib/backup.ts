@@ -45,6 +45,55 @@ export function backupFilename(date: Date = new Date()): string {
   return `daily-proof-backup-${y}-${m}-${d}.json`;
 }
 
+/** Builds and downloads a backup file. Shared by the Settings export button
+ *  and the backup reminder so there is one place that does this. */
+export async function downloadBackup(): Promise<void> {
+  const backup = await buildBackup();
+  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = backupFilename();
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ---------- Backup reminder ----------
+// A calm, infrequent nudge — never a nag. Proof lives only on this device
+// (see PRODUCT.md / the privacy promise), and platforms like iOS Safari can
+// evict it without warning after enough inactivity. The only real mitigation
+// is a habit of exporting, so we prompt for one — rarely, and only when
+// there is real, unbacked-up proof to protect.
+
+const REMINDER_SESSION_THRESHOLD = 30; // proofs collected since the last backup
+const REMINDER_DAY_THRESHOLD_MS = 30 * 86_400_000; // days since the last backup
+const REMINDER_COOLDOWN_MS = 30 * 86_400_000; // how long a dismissal is honored
+
+export function shouldRemindBackup(
+  sessions: SessionEntry[],
+  lastBackupAt: string | undefined,
+  dismissedAt: string | undefined,
+  now: Date = new Date()
+): boolean {
+  if (sessions.length === 0) return false; // nothing to lose yet
+
+  const sinceMs = lastBackupAt ? new Date(lastBackupAt).getTime() : 0;
+  const sessionsSinceBackup = sessions.filter((s) => new Date(s.completedAt).getTime() > sinceMs).length;
+
+  // Without a backup yet, "how long has unprotected proof existed" is
+  // measured from the oldest session, not from account creation.
+  const anchor = lastBackupAt
+    ? new Date(lastBackupAt).getTime()
+    : Math.min(...sessions.map((s) => new Date(s.completedAt).getTime()));
+  const dueByAge = now.getTime() - anchor >= REMINDER_DAY_THRESHOLD_MS;
+  const dueByVolume = sessionsSinceBackup >= REMINDER_SESSION_THRESHOLD;
+  if (!dueByAge && !dueByVolume) return false;
+
+  if (dismissedAt && now.getTime() - new Date(dismissedAt).getTime() < REMINDER_COOLDOWN_MS) return false;
+
+  return true;
+}
+
 // ---------- Validation ----------
 
 export class BackupValidationError extends Error {}
@@ -131,6 +180,14 @@ function validateSession(s: unknown, i: number): void {
   if (typeof s.completed !== "boolean") fail(`${at} is missing a boolean "completed".`);
   if (s.measurement !== undefined && typeof s.measurement !== "number") fail(`${at} has a non-numeric "measurement".`);
   if (typeof s.noteEdited !== "boolean") fail(`${at} is missing a boolean "noteEdited".`);
+  // Both absent = a Stopwatch session (or one saved before Timer mode
+  // existed) — that is the valid, common case, not an error.
+  if (s.mode !== undefined && s.mode !== "stopwatch" && s.mode !== "timer") {
+    fail(`${at} has an invalid "mode".`);
+  }
+  if (s.plannedDurationMs !== undefined && (typeof s.plannedDurationMs !== "number" || s.plannedDurationMs <= 0)) {
+    fail(`${at} has an invalid "plannedDurationMs".`);
+  }
   for (const k of ["startedAt", "completedAt", "createdAt", "updatedAt"] as const) {
     if (!isIso(s[k])) fail(`${at} has an invalid "${k}".`);
   }

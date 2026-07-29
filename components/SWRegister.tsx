@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
+import { getActiveSession } from "@/lib/repos/settings";
+import { markUpdatePending } from "@/lib/updatePending";
 
 export function SWRegister() {
   useEffect(() => {
@@ -31,7 +33,17 @@ export function SWRegister() {
       if (!hadController) return;
       if (refreshed) return;
       refreshed = true;
-      window.location.reload();
+      // Never pull the page out from under an active Focus session — the
+      // new version is already downloaded and waiting; AccessGuard applies
+      // it itself the moment no session is in progress (session saved, or
+      // never started). See lib/updatePending.ts.
+      getActiveSession().then((session) => {
+        if (session) {
+          markUpdatePending();
+        } else {
+          window.location.reload();
+        }
+      });
     });
   }, []);
 

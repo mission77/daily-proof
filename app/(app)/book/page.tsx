@@ -5,6 +5,7 @@ import { SessionEntry } from "@/lib/types";
 import { deleteSession, editSessionNote, listSessionsForDay } from "@/lib/repos/sessions";
 import { formatDayHeading, formatDuration, formatTimeOfDay, isSameLocalDay } from "@/lib/time";
 import { useToast } from "@/components/Toast";
+import { BackupReminder } from "@/components/BackupReminder";
 
 export default function BookPage() {
   const toast = useToast();
@@ -89,6 +90,7 @@ export default function BookPage() {
 
   return (
     <div>
+      <BackupReminder />
       {/* Page header: the date is the page */}
       <div className="flex items-center justify-between gap-3">
         <h1 className="font-display text-[26px] font-semibold leading-tight sm:text-3xl">
@@ -146,6 +148,12 @@ export default function BookPage() {
                   <span className="tabular-nums">{formatDuration(e.durationMs)}</span>
                   <span aria-hidden>·</span>
                   <span>{e.completed ? "Completed" : "Ended early"}</span>
+                  {e.mode === "timer" && e.plannedDurationMs !== undefined && (
+                    <>
+                      <span aria-hidden>·</span>
+                      <span className="tabular-nums">Planned {formatDuration(e.plannedDurationMs)}</span>
+                    </>
+                  )}
                   {e.measurement !== undefined && (
                     <>
                       <span aria-hidden>·</span>
@@ -193,17 +201,23 @@ function NoteEditor({
   const [notes, setNotes] = useState(entry.notes ?? "");
   const [saving, setSaving] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+  // An accidental backdrop tap or Escape must never silently throw away a
+  // reflection someone was in the middle of writing — only the explicit
+  // Cancel button discards unsaved text once there is any.
+  const dirty = notes !== (entry.notes ?? "");
 
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && !dirty) onClose();
+    };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
+  }, [onClose, dirty]);
 
   return (
     <div
       className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 sm:items-center sm:p-6"
-      onMouseDown={(e) => e.target === e.currentTarget && onClose()}
+      onMouseDown={(e) => e.target === e.currentTarget && !dirty && onClose()}
       role="dialog"
       aria-modal="true"
       aria-label="Edit note"
@@ -213,6 +227,9 @@ function NoteEditor({
         <p className="mt-1 text-[13px] text-ink-faint">
           {formatTimeOfDay(entry.completedAt)} · {formatDuration(entry.durationMs)} ·{" "}
           {entry.completed ? "Completed" : "Ended early"}
+          {entry.mode === "timer" &&
+            entry.plannedDurationMs !== undefined &&
+            ` · Planned ${formatDuration(entry.plannedDurationMs)}`}
           {entry.measurement !== undefined &&
             ` · ${entry.measurement}${entry.measurementUnit ? ` ${entry.measurementUnit}` : ""}`}
         </p>

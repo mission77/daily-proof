@@ -36,14 +36,14 @@ function RollDigit({ value }: { value: string }) {
   );
 }
 
-export function FlipTimer({ elapsedMs }: { elapsedMs: number }) {
+export function FlipTimer({ elapsedMs, label = "Elapsed time" }: { elapsedMs: number; label?: string }) {
   const groups = timerParts(elapsedMs);
-  const label = groups.join(":");
+  const digits = groups.join(":");
 
   return (
     <div
       role="timer"
-      aria-label={`Elapsed time ${label}`}
+      aria-label={`${label} ${digits}`}
       className="flex items-center justify-center gap-1.5 sm:gap-2
         [--dw:2.7rem] [--dh:4rem] [--dfs:2.4rem]
         sm:[--dw:3.6rem] sm:[--dh:5.2rem] sm:[--dfs:3.2rem]

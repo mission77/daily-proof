@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ActiveSession, Practice, nowIso } from "@/lib/types";
+import { ActiveSession, Practice, SessionMode, nowIso } from "@/lib/types";
 import {
   PracticeInput,
   createPractice,
@@ -14,10 +14,16 @@ import {
 import {
   getActiveSession,
   getFocusPracticeId,
+  getLastSessionMode,
+  getLastTimerDurationMs,
   setActiveSession,
   setFocusPracticeId,
+  setLastSessionMode,
+  setLastTimerDurationMs,
 } from "@/lib/repos/settings";
+import { primeAudioContext } from "@/lib/completionSound";
 import { PracticeForm } from "@/components/PracticeForm";
+import { TimerSetup, TimerChoice } from "@/components/TimerSetup";
 import { useToast } from "@/components/Toast";
 
 const EVIDENCE_LABEL: Record<string, string> = {
@@ -36,6 +42,19 @@ export default function StudioPage() {
   const [active, setActive] = useState<ActiveSession | undefined>();
   const [formTarget, setFormTarget] = useState<Practice | "new" | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<Practice | null>(null);
+  const [initialMode, setInitialMode] = useState<SessionMode>("stopwatch");
+  const [initialMinutes, setInitialMinutes] = useState(25);
+  const [choice, setChoice] = useState<TimerChoice>({ mode: "stopwatch" });
+  const [choiceValid, setChoiceValid] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      const [mode, ms] = await Promise.all([getLastSessionMode(), getLastTimerDurationMs()]);
+      setInitialMode(mode);
+      if (ms) setInitialMinutes(Math.round(ms / 60_000));
+      setChoice(ms ? { mode, plannedDurationMs: ms } : { mode });
+    })();
+  }, []);
 
   const reload = useCallback(async () => {
     try {
@@ -75,6 +94,11 @@ export default function StudioPage() {
       router.push("/focus");
       return;
     }
+    // A genuine user gesture (this click) is what browsers require before
+    // audio is allowed to play later, un-gestured, when a Timer reaches
+    // zero — see lib/completionSound.ts.
+    primeAudioContext();
+
     const session: ActiveSession = {
       practiceId: practice.id,
       practiceNameSnapshot: practice.name,
@@ -82,8 +106,14 @@ export default function StudioPage() {
       accumulatedMs: 0,
       lastResumedAt: nowIso(),
       status: "running",
+      mode: choice.mode,
+      ...(choice.mode === "timer" ? { plannedDurationMs: choice.plannedDurationMs } : {}),
     };
     await setActiveSession(session);
+    await setLastSessionMode(choice.mode);
+    if (choice.mode === "timer" && choice.plannedDurationMs) {
+      await setLastTimerDurationMs(choice.plannedDurationMs);
+    }
     router.push("/focus");
   }
 
@@ -205,9 +235,23 @@ export default function StudioPage() {
                   Return to session
                 </button>
               ) : (
-                <button className="btn-primary w-full sm:w-auto" onClick={() => startSession(focus)}>
-                  Start session
-                </button>
+                <>
+                  <TimerSetup
+                    initialMode={initialMode}
+                    initialMinutes={initialMinutes}
+                    onChange={(next, valid) => {
+                      setChoice(next);
+                      setChoiceValid(valid);
+                    }}
+                  />
+                  <button
+                    className="btn-primary mt-4 w-full sm:w-auto"
+                    disabled={!choiceValid}
+                    onClick={() => startSession(focus)}
+                  >
+                    Start session
+                  </button>
+                </>
               )}
             </div>
           </div>

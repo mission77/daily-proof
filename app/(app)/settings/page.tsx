@@ -7,22 +7,17 @@ import { useToast } from "@/components/Toast";
 import {
   BackupValidationError,
   ImportMode,
-  backupFilename,
-  buildBackup,
+  downloadBackup,
   parseBackup,
   previewBackup,
   restoreBackup,
 } from "@/lib/backup";
-import {
-  effectiveRole,
-  getAccessState,
-  roleLabel,
-  setAccessRole,
-  trialDaysLeft,
-} from "@/lib/repos/access";
+import { effectiveRole, getAccessState, roleLabel, setAccessRole } from "@/lib/repos/access";
 import { AccessCodeForm } from "@/components/AccessCodeForm";
+import { RestoreAccessForm } from "@/components/RestoreAccessForm";
+import { BETA_MODE } from "@/lib/site";
 import { STORES, idbClear } from "@/lib/db";
-import { clearActiveSession } from "@/lib/repos/settings";
+import { clearActiveSession, getSoundEnabled, recordBackupTaken, setSoundEnabled } from "@/lib/repos/settings";
 import { createPractice } from "@/lib/repos/practices";
 import { saveProof } from "@/lib/repos/sessions";
 
@@ -42,22 +37,24 @@ export default function SettingsPage() {
   const [pending, setPending] = useState<{ backup: BackupFile; preview: BackupPreview } | null>(null);
   const [importError, setImportError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [soundEnabled, setSoundEnabledState] = useState(true);
+  const [showRestore, setShowRestore] = useState(false);
 
   useEffect(() => {
     getAccessState().then(setAccess);
+    getSoundEnabled().then(setSoundEnabledState);
   }, []);
+
+  async function toggleSound(enabled: boolean) {
+    setSoundEnabledState(enabled);
+    await setSoundEnabled(enabled);
+  }
 
   // ---------- Backup ----------
 
   async function exportBackup() {
-    const backup = await buildBackup();
-    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = backupFilename();
-    a.click();
-    URL.revokeObjectURL(url);
+    await downloadBackup();
+    await recordBackupTaken();
     toast("Backup exported");
   }
 
@@ -143,14 +140,22 @@ export default function SettingsPage() {
   // ---------- Access code ----------
   const [portalBusy, setPortalBusy] = useState(false);
 
+  // Stripe-derived Premium (activated via checkout) has a signed token but
+  // no locally-stored customer id — the billing-portal endpoint derives the
+  // customer from that token's verified subscription instead, so the
+  // browser never needs to hold or send one.
+  const stripePremiumToken =
+    access?.role === "premium" && access.license?.token ? access.license.token : null;
+  const canManageBilling = stripePremiumToken !== null;
+
   async function openBillingPortal() {
-    if (!access?.stripeCustomerId || portalBusy) return;
+    if (portalBusy || !stripePremiumToken) return;
     setPortalBusy(true);
     try {
-      const res = await fetch("/api/stripe/customer-portal", {
+      const res = await fetch("/api/access/billing-portal", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ customerId: access.stripeCustomerId }),
+        body: JSON.stringify({ token: stripePremiumToken }),
       });
       const data = await res.json();
       if (res.ok && data.url) window.location.assign(data.url);
@@ -162,7 +167,6 @@ export default function SettingsPage() {
     }
   }
 
-  const daysLeft = access ? trialDaysLeft(access) : null;
   const currentRole = access ? effectiveRole(access) : null;
 
   return (
@@ -198,6 +202,37 @@ export default function SettingsPage() {
         </div>
       </section>
 
+      {/* ---------- Focus ---------- */}
+      <section aria-labelledby="s-focus">
+        <h2 id="s-focus" className="text-xs font-medium uppercase tracking-[0.14em] text-ink-faint">
+          Focus
+        </h2>
+        <div className="card mt-2.5 flex items-center justify-between gap-3 p-5">
+          <div>
+            <p className="text-[15px] font-medium">Completion sound</p>
+            <p className="mt-0.5 text-[13.5px] text-ink-soft">Plays once when a Timer session reaches zero.</p>
+          </div>
+          <div className="inline-flex shrink-0 rounded-xl border border-line p-1">
+            {[
+              { value: true, label: "On" },
+              { value: false, label: "Off" },
+            ].map((opt) => (
+              <button
+                key={String(opt.value)}
+                type="button"
+                aria-pressed={soundEnabled === opt.value}
+                onClick={() => toggleSound(opt.value)}
+                className={`rounded-lg px-3.5 py-1.5 text-[14px] font-medium transition-colors ${
+                  soundEnabled === opt.value ? "bg-surface2 text-ink" : "text-ink-soft hover:text-ink"
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ---------- Access ---------- */}
       <section aria-labelledby="s-access">
         <h2 id="s-access" className="text-xs font-medium uppercase tracking-[0.14em] text-ink-faint">
@@ -211,15 +246,20 @@ export default function SettingsPage() {
                 {currentRole ? roleLabel(currentRole) : "…"}
                 {access?.license?.expiresAt &&
                   ` · until ${new Date(access.license.expiresAt).toLocaleDateString()}`}
-                {daysLeft !== null && ` · ${daysLeft} day${daysLeft === 1 ? "" : "s"} left`}
               </p>
             </div>
-            {access?.stripeCustomerId && (
+            {canManageBilling && (
               <button className="btn-quiet shrink-0" onClick={openBillingPortal} disabled={portalBusy}>
                 {portalBusy ? "Opening…" : "Manage billing"}
               </button>
             )}
           </div>
+          {canManageBilling && (
+            <p className="mt-2 text-[12.5px] text-ink-faint">
+              Update your payment method or cancel your subscription directly with Stripe — no
+              need to contact support.
+            </p>
+          )}
           <div className="mt-4 border-t border-line pt-4">
             <label htmlFor="s-code" className="text-[13.5px] font-medium text-ink-soft">
               Have an access code?
@@ -236,6 +276,20 @@ export default function SettingsPage() {
               Entering a new code replaces your current one. No account needed — the code is your key.
             </p>
           </div>
+          {!BETA_MODE && (
+            <div className="mt-4 border-t border-line pt-4">
+              {showRestore ? (
+                <RestoreAccessForm onClose={() => setShowRestore(false)} />
+              ) : (
+                <button
+                  className="text-[13px] text-ink-faint underline-offset-2 hover:text-ink hover:underline"
+                  onClick={() => setShowRestore(true)}
+                >
+                  Bought Premium on another device? Restore access
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </section>
 
@@ -246,8 +300,14 @@ export default function SettingsPage() {
         </h2>
         <div className="card mt-2.5 p-5">
           <p className="text-[14px] text-ink-soft">
-            A backup is a single JSON file with your practices, proof, and settings. Keep one
-            somewhere safe — local-first means you hold the only copy.
+            Everything lives in this browser&rsquo;s local storage — there is no cloud backup, on
+            any plan. A backup is a single JSON file with your practices, proof, and settings;
+            exporting one is the only copy that exists anywhere else.
+          </p>
+          <p className="mt-2 text-[13px] text-ink-faint">
+            A browser can clear local storage without warning — low disk space, private
+            browsing, an uninstall — and without a recent export, that proof can&rsquo;t be
+            recovered. Import brings a backup onto a new device or browser.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
             <button className="btn-quiet" onClick={exportBackup}>
@@ -302,12 +362,7 @@ export default function SettingsPage() {
           </p>
           <div className="mt-2.5 flex items-center justify-between text-[13px] text-ink-faint">
             <span>Version 1.0.0</span>
-            {access && (
-              <span>
-                {roleLabel(access.role)}
-                {daysLeft !== null ? ` · ${daysLeft} day${daysLeft === 1 ? "" : "s"} left` : ""}
-              </span>
-            )}
+            {access && <span>{roleLabel(access.role)}</span>}
           </div>
           {access?.role === "free" && (
             <a href="/upgrade" className="btn-quiet mt-4 block w-full text-center sm:w-auto sm:px-6">

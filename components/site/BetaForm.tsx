@@ -27,6 +27,8 @@ export function BetaForm() {
       }
       if (res.status === 400) {
         setError("That doesn't look like a valid email address.");
+      } else if (res.status === 429) {
+        setError("Too many attempts — please wait a moment and try again.");
       } else if (res.status === 503 && IS_DEV) {
         setError("Beta signups aren't configured yet (set LOOPS_API_KEY).");
       } else {

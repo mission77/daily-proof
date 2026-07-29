@@ -16,6 +16,8 @@ export interface Practice {
 
 // ---------- Sessions (proof entries) ----------
 
+export type SessionMode = "stopwatch" | "timer";
+
 export interface SessionEntry {
   id: string;
   practiceId: string; // may point to a deleted practice; snapshot below keeps proof intact
@@ -30,6 +32,13 @@ export interface SessionEntry {
   createdAt: string; // ISO
   updatedAt: string; // ISO
   noteEdited: boolean;
+  /** Absent = Stopwatch (also true of every session saved before Timer
+   *  mode existed — treated as Stopwatch, never migrated). */
+  mode?: SessionMode;
+  /** Only present when mode is "timer": the duration chosen at setup.
+   *  durationMs remains the actual proof; overtime (if any) is
+   *  durationMs − plannedDurationMs, computed on demand, never stored. */
+  plannedDurationMs?: number;
 }
 
 // ---------- Active session (survives refresh) ----------
@@ -42,6 +51,18 @@ export interface ActiveSession {
   lastResumedAt: string | null; // ISO when running, null when paused
   status: "running" | "paused" | "finishing";
   finishedElapsedMs?: number; // frozen elapsed once Finish is pressed
+  /** Absent = Stopwatch. Everything below only ever applies to "timer". */
+  mode?: SessionMode;
+  plannedDurationMs?: number;
+  /** True once the completion sound has fired for this session's zero
+   *  crossing — persisted so a refresh right after zero can't replay it. */
+  completionSoundPlayed?: boolean;
+  /** True once the user chooses "Continue working" past zero. While this
+   *  is false and elapsed >= plannedDurationMs, Focus shows the completion
+   *  prompt (on every render, including after a refresh — that's correct:
+   *  the decision hasn't been made yet). Once true, Focus shows overtime
+   *  counting up, using the exact same accumulation math as Stopwatch. */
+  continuedPastPlanned?: boolean;
 }
 
 // ---------- Settings ----------
@@ -62,14 +83,17 @@ export interface StoredLicense {
   role: AccessRole;
   expiresAt: string | null; // ISO, null = never
   validatedAt: string; // ISO
+  /** Present only for Stripe-activated licenses (premium/lifetime): the
+   *  opaque signed token returned by /api/checkout/activate or
+   *  /api/access/refresh. Re-sent verbatim to refresh premium access —
+   *  never parsed or trusted client-side. Manual codes never set this. */
+  token?: string;
 }
 
 export interface AccessState {
   key: "access"; // singleton
   role: AccessRole;
-  trialStartedAt: string | null; // ISO, set on first launch for free role
   license?: StoredLicense; // present after redeeming an access code
-  stripeCustomerId?: string; // set after a verified checkout, for the billing portal
   updatedAt: string;
 }
 

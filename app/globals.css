@@ -12,7 +12,7 @@
   --surface-2: 38 38% 91%;
   --ink: 30 22% 14%; /* #2b241c rich charcoal */
   --ink-soft: 30 12% 38%;
-  --ink-faint: 32 10% 55%;
+  --ink-faint: 32 10% 40%; /* darkened from 55% — 55% read at 2.9:1 against --bg, below WCAG AA (4.5:1) for the small text it's used on (timestamps, hints, labels); 40% clears 4.5:1 with margin */
   --line: 36 24% 84%;
   --line-strong: 34 20% 74%;
 
@@ -20,7 +20,7 @@
   --ember-a: 22 100% 55%; /* #ff7a1a */
   --ember-b: 36 100% 62%; /* #ffb43d */
   --ember: 26 100% 56%;
-  --ember-ink: 26 90% 42%; /* readable orange for small text on light bg */
+  --ember-ink: 26 90% 36%; /* darkened from 42% — 42% read at 3.6:1 against --bg, below WCAG AA (4.5:1) for the small badge/label text it's used on; 36% clears 4.5:1 with margin */
 
   /* Flip timer panels are charcoal in both themes */
   --panel: 28 14% 13%;
@@ -38,7 +38,7 @@
   --surface-2: 28 10% 16%;
   --ink: 38 32% 91%; /* warm off-white */
   --ink-soft: 34 14% 66%;
-  --ink-faint: 32 10% 48%;
+  --ink-faint: 32 10% 52%; /* lightened from 48% — 48% read at 4.34:1 against --bg, just under WCAG AA (4.5:1); 52% clears it */
   --line: 28 9% 21%;
   --line-strong: 28 9% 30%;
 
