@@ -1,0 +1,12 @@
+import { chromium } from "playwright";
+const OUT = "C:/Users/twend/AppData/Local/Temp/claude/c--Users-twend-Downloads-daily-proof-daily-proof/75230b46-982f-45e4-b2bf-c384a9962500/scratchpad/shots";
+const browser = await chromium.launch();
+const page = await browser.newPage({ viewport: { width: 1280, height: 900 }, colorScheme: "light" });
+await page.goto("http://localhost:3000/studio");
+await page.waitForTimeout(600);
+await page.screenshot({ path: `${OUT}/01-studio-light.png` });
+await page.getByRole("radio", { name: "Timer" }).click();
+await page.waitForTimeout(200);
+await page.screenshot({ path: `${OUT}/02-studio-timer-setup-light.png` });
+await browser.close();
+console.log("done");

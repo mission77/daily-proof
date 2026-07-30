@@ -6,7 +6,7 @@ import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Pricing",
-  description: "Start a 3-day trial (card required, then $7/month) — or $70 once as a Founding Member, for life.",
+  description: "Start a 3-day trial (card required, then $7/month) — or pay $70 once for lifetime access.",
   alternates: { canonical: `${SITE_URL}/pricing` },
 };
 

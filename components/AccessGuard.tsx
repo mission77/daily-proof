@@ -95,14 +95,28 @@ export function AccessGuard({ children }: { children: React.ReactNode }) {
       <div className="mx-auto flex min-h-[60dvh] w-full max-w-xl flex-col justify-center px-1 py-6 text-center">
         <div>
           <Wordmark className="text-xl" />
-          <h1 className="mt-6 font-display text-[26px] font-semibold leading-tight sm:text-3xl">
-            Daily Proof is in private beta.
-          </h1>
-          <p className="mx-auto mt-2 max-w-md text-[15px] leading-relaxed text-ink-soft">
-            The app is open to invited members only. Enter your access code below to unlock
-            Studio and Book on this device. Settings — including exporting your data — is
-            always open, no code required.
-          </p>
+          {BETA_MODE ? (
+            <>
+              <h1 className="mt-6 font-display text-[26px] font-semibold leading-tight sm:text-3xl">
+                Daily Proof is in private beta.
+              </h1>
+              <p className="mx-auto mt-2 max-w-md text-[15px] leading-relaxed text-ink-soft">
+                The app is open to invited members only. Enter your access code below to unlock
+                Studio and Book on this device. Settings — including exporting your data — is
+                always open, no code required.
+              </p>
+            </>
+          ) : (
+            <>
+              <h1 className="mt-6 font-display text-[26px] font-semibold leading-tight sm:text-3xl">
+                Unlock Daily Proof on this device.
+              </h1>
+              <p className="mx-auto mt-2 max-w-md text-[15px] leading-relaxed text-ink-soft">
+                Studio and Book need an active plan or access code. Settings — including
+                exporting your data — is always open, no code required.
+              </p>
+            </>
+          )}
           {expiredPremium && (
             <p className="mx-auto mt-3 max-w-md text-[13.5px] leading-relaxed text-ink-faint">
               Your subscription access could not be renewed. If you&rsquo;re still subscribed, this

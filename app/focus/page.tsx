@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ActiveSession, Practice, SessionEntry, nowIso } from "@/lib/types";
 import {
@@ -394,6 +395,7 @@ function FocusSession() {
 
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center px-5 py-10">
+      <StudioLink />
       {/* Persistent branding: quiet, above the work, never competing with it. */}
       <Wordmark className="text-base opacity-80" />
       <p className="mt-3 font-display text-xl font-medium text-ink-soft sm:text-2xl lg:text-3xl">{liveName}</p>
@@ -503,6 +505,7 @@ function TimerComplete({
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col items-center justify-center px-5 py-10 text-center">
+      <StudioLink />
       <Wordmark className="text-base opacity-80" />
       <p className="mt-3 font-display text-xl font-medium text-ink-soft sm:text-2xl">{liveName}</p>
       <div className="mt-8">
@@ -523,6 +526,25 @@ function TimerComplete({
         </button>
       </div>
     </div>
+  );
+}
+
+/** Quiet secondary navigation back to Studio while the session keeps
+ *  running untouched — a plain route change, not a session control, so it
+ *  never pauses/finishes/resets anything (see FocusSession: nothing there
+ *  reacts to unmount or route changes). Desktop/tablet only: on a phone the
+ *  native Back gesture already returns to Studio without disturbing the
+ *  session, so a second on-screen control would just be redundant chrome
+ *  competing for the same limited space as the timer and practice title. */
+function StudioLink() {
+  return (
+    <Link
+      href="/studio"
+      aria-label="Back to Studio — session keeps running"
+      className="btn-ghost fixed left-4 top-4 hidden sm:inline-flex sm:left-6 sm:top-6"
+    >
+      <span aria-hidden>←</span> Studio
+    </Link>
   );
 }
 

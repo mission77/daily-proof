@@ -2,11 +2,9 @@ import { test, expect } from "@playwright/test";
 
 // Copy/trust smoke checks: catches contradictory or drifted claims (trial
 // terms, support address, backup honesty) without re-litigating wording the
-// Founder Review already approved. This environment runs with
-// NEXT_PUBLIC_BETA_MODE unset (defaults to beta-on, see lib/site.ts), so
-// pricing shows the Founding Beta screen rather than live checkout — the
-// $7/month · 3-day-trial claim is instead verified on the marketing pages
-// that state it unconditionally (pricing metadata, terms, refunds).
+// Founder Review already approved. Daily Proof has launched
+// (NEXT_PUBLIC_BETA_MODE=0, see .env.local / lib/site.ts) — pricing shows
+// the live PlanPicker, not the Founding Beta placeholder.
 
 test("support email is real and consistent on Contact and Support pages", async ({ page }) => {
   await page.goto("/contact");
@@ -28,12 +26,11 @@ test("trial terms are stated consistently on Terms and Refunds", async ({ page }
   await expect(page.getByText("dailyproofhq@gmail.com")).toBeVisible();
 });
 
-test("pricing page never claims checkout is live while in beta mode", async ({ page }) => {
+test("pricing page shows the live checkout, not the retired beta placeholder", async ({ page }) => {
   await page.goto("/pricing");
-  await expect(page.getByRole("heading", { name: "Founding Beta" })).toBeVisible();
-  // No "$7/month" checkout CTA should render while beta-gated — that copy
-  // only belongs to the live PlanPicker.
-  await expect(page.getByRole("button", { name: "Start 3-day trial" })).not.toBeVisible();
+  await expect(page.getByRole("heading", { name: "Founding Beta" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Start 3-day trial" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Buy lifetime" })).toBeVisible();
 });
 
 test("Settings backup copy is honest: no cloud backup, eviction risk stated, import purpose stated", async ({

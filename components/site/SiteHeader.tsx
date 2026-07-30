@@ -18,7 +18,7 @@ const NAV = BETA_MODE
     ];
 const CTA = BETA_MODE
   ? { href: "/#beta", label: "Request Early Access" }
-  : { href: "/studio", label: "Open the App" };
+  : { href: "/studio", label: "Open Daily Proof" };
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);

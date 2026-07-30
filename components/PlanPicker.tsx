@@ -49,8 +49,8 @@ export function PlanPicker() {
 
   return (
     <div>
-      <div className="grid items-start gap-4 sm:grid-cols-2">
-        <div className="card relative p-6 shadow-lg ring-1 ring-ember/40 sm:-mt-2 sm:pb-8">
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="card relative flex h-full flex-col p-6 shadow-lg ring-1 ring-ember/40 sm:-mt-2 sm:pb-8">
           <span className="absolute right-4 top-4 rounded-full bg-ember/10 px-2.5 py-0.5 text-[12px] font-medium text-ember-ink">
             Recommended
           </span>
@@ -61,6 +61,7 @@ export function PlanPicker() {
           <p className="mt-2 text-[14px] text-ink-soft">
             Includes 3-day trial. Card required. Then $7/month unless canceled.
           </p>
+          <div className="flex-1" />
           <button
             className="btn-primary mt-5 w-full"
             disabled={devDisabled || busy !== null}
@@ -69,14 +70,13 @@ export function PlanPicker() {
             {busy === "monthly" ? "Opening checkout…" : "Start 3-day trial"}
           </button>
         </div>
-        <div className="card p-6">
+        <div className="card flex h-full flex-col p-6">
           <p className="text-sm font-medium text-ink-soft">Lifetime</p>
           <p className="mt-1 font-display text-3xl font-semibold">
             $70<span className="text-base font-normal text-ink-faint"> once</span>
           </p>
-          <p className="mt-2 text-[14px] text-ink-soft">
-            Founding Member Lifetime. One purchase, yours forever.
-          </p>
+          <p className="mt-2 text-[14px] text-ink-soft">One purchase, yours forever.</p>
+          <div className="flex-1" />
           <button
             className="btn-quiet mt-5 w-full"
             disabled={devDisabled || busy !== null}
