@@ -12,7 +12,7 @@ import {
   previewBackup,
   restoreBackup,
 } from "@/lib/backup";
-import { effectiveRole, getAccessState, roleLabel, setAccessRole } from "@/lib/repos/access";
+import { getAccessState, planLabel, roleLabel, setAccessRole } from "@/lib/repos/access";
 import { AccessCodeForm } from "@/components/AccessCodeForm";
 import { RestoreAccessForm } from "@/components/RestoreAccessForm";
 import { BETA_MODE } from "@/lib/site";
@@ -167,8 +167,6 @@ export default function SettingsPage() {
     }
   }
 
-  const currentRole = access ? effectiveRole(access) : null;
-
   return (
     // Desktop lays the setting cards out in two columns; below lg the
     // original single column (space-y) is untouched.
@@ -243,7 +241,7 @@ export default function SettingsPage() {
             <div>
               <p className="text-[15px] font-medium">Current plan</p>
               <p className="mt-0.5 text-[13.5px] text-ink-soft">
-                {currentRole ? roleLabel(currentRole) : "…"}
+                {access ? planLabel(access) : "…"}
                 {access?.license?.expiresAt &&
                   ` · until ${new Date(access.license.expiresAt).toLocaleDateString()}`}
               </p>

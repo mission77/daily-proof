@@ -105,3 +105,19 @@ export function roleLabel(role: AccessRole): string {
       return "No active plan";
   }
 }
+
+/** A more precise label than roleLabel() for surfaces where it matters
+ *  whether "premium" means an actual recurring Stripe subscription or just
+ *  premium-tier access with nothing behind it to bill — a manually issued
+ *  code (self-redeemed or gifted) and a dev-only role switch both produce
+ *  role "premium" with no `license.token`, identical to a real Monthly
+ *  subscription unless this distinction is made explicit. Settings' "Current
+ *  plan" line uses this so the label never implies billing management is
+ *  available when there is nothing to manage. */
+export function planLabel(state: AccessState): string {
+  const role = effectiveRole(state);
+  if (role === "premium") {
+    return state.license?.token ? "Monthly" : "Premium (access code)";
+  }
+  return roleLabel(role);
+}
