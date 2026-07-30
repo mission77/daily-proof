@@ -250,14 +250,14 @@ export default function SettingsPage() {
             </div>
             {canManageBilling && (
               <button className="btn-quiet shrink-0" onClick={openBillingPortal} disabled={portalBusy}>
-                {portalBusy ? "Opening…" : "Manage billing"}
+                {portalBusy ? "Opening…" : "Manage subscription"}
               </button>
             )}
           </div>
           {canManageBilling && (
             <p className="mt-2 text-[12.5px] text-ink-faint">
-              Update your payment method or cancel your subscription directly with Stripe — no
-              need to contact support.
+              Opens Stripe&rsquo;s secure billing portal, where you can cancel your subscription,
+              update your payment method, or view billing history — no need to contact support.
             </p>
           )}
           <div className="mt-4 border-t border-line pt-4">

@@ -109,8 +109,19 @@ export async function seedSetting(page: Page, key: string, value: unknown): Prom
  *  AccessState record the app itself would write after a real code
  *  redemption or Stripe activation, so every other test can assume it's
  *  already unlocked. */
-export async function seedAccess(page: Page, role: string = "owner"): Promise<void> {
-  await seedRecord(page, "access", { key: "access", role, updatedAt: new Date().toISOString() });
+export async function seedAccess(
+  page: Page,
+  role: string = "owner",
+  license?: { token?: string; expiresAt?: string | null }
+): Promise<void> {
+  await seedRecord(page, "access", {
+    key: "access",
+    role,
+    updatedAt: new Date().toISOString(),
+    ...(license
+      ? { license: { code: "test", role, expiresAt: license.expiresAt ?? null, validatedAt: new Date().toISOString(), token: license.token } }
+      : {}),
+  });
 }
 
 export async function readSessions(page: Page): Promise<any[]> {

@@ -37,6 +37,7 @@ function SuccessInner() {
   const [planLabel, setPlanLabel] = useState<string>("");
   const [message, setMessage] = useState<string>(DEFAULT_FAILURE);
   const [trialEnd, setTrialEnd] = useState<string | null>(null);
+  const [isSubscription, setIsSubscription] = useState(false);
 
   useEffect(() => {
     const sessionId = params.get("session_id");
@@ -82,6 +83,7 @@ function SuccessInner() {
         if (cancelled) return;
         setPlanLabel(roleLabel(effectiveRole(finalState)));
         setTrialEnd(typeof data.trialEnd === "string" ? data.trialEnd : null);
+        setIsSubscription(data.role === "premium");
         setState("ready");
       } catch {
         if (!cancelled) {
@@ -119,7 +121,8 @@ function SuccessInner() {
           )}
           <p className="mx-auto mt-3 max-w-sm text-[13px] leading-relaxed text-ink-faint">
             Your proof stays on this device only — nothing syncs automatically. Export a backup
-            from Settings to protect or move it. You can cancel anytime from Settings.
+            from Settings to protect or move it.
+            {isSubscription && " You can cancel anytime from Settings → Access."}
           </p>
           <button className="btn-primary mt-7" onClick={() => router.push("/studio")}>
             Open Daily Proof

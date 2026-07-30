@@ -66,7 +66,7 @@ export function AccessCodeForm({
         <input
           id="s-code"
           className="field flex-1 uppercase placeholder:normal-case"
-          placeholder="e.g. BETA-XXXXXXXXX-XXXXXXXXXX"
+          placeholder="e.g. PRO-XXXXXXXXX-XXXXXXXXXX"
           value={codeInput}
           onChange={(e) => setCodeInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && redeemCode()}
