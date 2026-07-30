@@ -41,15 +41,15 @@ export default function PrivacyPage() {
 
       <h2 className="mt-10 font-display text-xl font-semibold">Payments</h2>
       <p className="mt-3 leading-relaxed text-ink-soft">
-        If you purchase a plan in the future, payments will be securely
-        processed by Stripe. We never receive or store your payment details.
+        When you purchase a plan, payments are securely processed by Stripe.
+        We never receive or store your payment details.
       </p>
 
       <h2 className="mt-10 font-display text-xl font-semibold">Accounts</h2>
       <p className="mt-3 leading-relaxed text-ink-soft">
-        During beta, Daily Proof does not require an account to use the app.
-        If optional accounts are introduced in the future, they will always be
-        optional and this policy will be updated first.
+        Daily Proof does not require an account to use the app. If optional
+        accounts are introduced in the future, they will always be optional
+        and this policy will be updated first.
       </p>
 
       <h2 className="mt-10 font-display text-xl font-semibold">What we don&rsquo;t do</h2>

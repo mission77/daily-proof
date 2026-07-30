@@ -32,8 +32,8 @@ export default function TermsPage() {
       <h2 className="mt-10 font-display text-xl font-semibold">3. Plans and billing</h2>
       <p className="mt-3 leading-relaxed text-ink-soft">
         Daily Proof offers a 3-day free trial (a payment card is required to start it), a monthly
-        subscription ($7/month), and a one-time Founding Member Lifetime purchase ($70, a
-        limited-time launch offer). Payments are processed by Stripe. The monthly subscription
+        subscription ($7/month), and a one-time Lifetime purchase ($70). Payments are processed
+        by Stripe. The monthly subscription
         begins automatically when the trial ends unless cancelled beforehand; cancelling during
         the trial is free. Subscriptions renew automatically until cancelled; cancellation stops
         future charges and access continues to the end of the paid period. Prices may change with

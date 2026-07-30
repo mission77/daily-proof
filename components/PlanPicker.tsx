@@ -99,7 +99,7 @@ export function PlanPicker() {
         </p>
       )}
       <p className="mt-5 text-center text-[13px] leading-relaxed text-ink-faint">
-        Your proof stays on this device — nothing syncs automatically. Cancel anytime from
+        Your proof stays on this device. Nothing syncs automatically. Cancel anytime from
         Settings. Questions?{" "}
         <a className="underline underline-offset-2 hover:text-ink" href={`mailto:${SUPPORT_EMAIL}`}>
           {SUPPORT_EMAIL}

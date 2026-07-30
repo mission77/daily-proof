@@ -7,7 +7,10 @@ export const SITE_DESCRIPTION =
   "Daily Proof helps you focus, finish meaningful work, and keep a private record of the work you actually did. Local-first, offline, and calm by design.";
 export const SUPPORT_EMAIL = "dailyproofhq@gmail.com";
 
-// Pre-launch beta mode: hides public checkout and points the site at the
-// Founding Beta invitation flow. Flip NEXT_PUBLIC_BETA_MODE=0 at launch to
-// restore pricing and checkout everywhere — nothing is removed, only hidden.
-export const BETA_MODE = process.env.NEXT_PUBLIC_BETA_MODE !== "0";
+// Daily Proof has launched. The default (no env var set) is the live public
+// site: full pricing, Stripe checkout, "Open the app" everywhere. This is
+// deliberately opt-in rather than opt-out: a missing or unset env var must
+// never silently revert a shipped product back to invite-only. Set
+// NEXT_PUBLIC_BETA_MODE=1 only to temporarily fall back to the dormant
+// invite-only beta flow (e.g. pausing public signups in an emergency).
+export const BETA_MODE = process.env.NEXT_PUBLIC_BETA_MODE === "1";

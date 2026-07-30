@@ -16,9 +16,13 @@ const NAV = BETA_MODE
       { href: "/pricing", label: "Pricing" },
       { href: "/support", label: "Support" },
     ];
+// The header CTA is the returning-customer action, always the same
+// destination regardless of whether this device already has access —
+// AccessGuard decides what /studio actually shows (Studio itself, or the
+// unlock screen with pricing/restore-access) the moment it loads.
 const CTA = BETA_MODE
   ? { href: "/#beta", label: "Request Early Access" }
-  : { href: "/studio", label: "Open Daily Proof" };
+  : { href: "/studio", label: "Open the app" };
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);

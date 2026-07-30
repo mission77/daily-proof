@@ -7,9 +7,9 @@ import { PlanPicker } from "@/components/PlanPicker";
 import { Reveal } from "@/components/site/Reveal";
 
 export const metadata: Metadata = {
-  title: "Daily Proof — Collect proof that meaningful work happened",
+  title: "Daily Proof: Collect proof that meaningful work happened",
   description:
-    "A private place to focus, reflect, and keep proof of the work you actually did. Local-first, no account, no cloud backup — just an honest record.",
+    "A private place to focus, reflect, and keep proof of the work you actually did. Local-first, no account, no cloud backup. Just an honest record.",
   alternates: { canonical: SITE_URL },
 };
 
@@ -35,7 +35,7 @@ function AppJsonLd() {
     operatingSystem: "Web",
     url: SITE_URL,
     description:
-      "A private, local-first place to focus, reflect, and keep proof of meaningful work — no account, no cloud backup.",
+      "A private, local-first place to focus, reflect, and keep proof of meaningful work. No account, no cloud backup.",
     offers: {
       "@type": "AggregateOffer",
       priceCurrency: "USD",
@@ -47,30 +47,23 @@ function AppJsonLd() {
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} />;
 }
 
-/** A real product screenshot in a quiet, paper-like frame. Width/height are
- *  each image's true captured size (not a shared guess) — Next/Image uses
- *  them to reserve the correct space before load, so nothing jumps into
- *  place once the image resolves. */
-function Screen({
-  src,
-  alt,
-  width,
-  height,
-  wide = false,
-}: {
-  src: string;
-  alt: string;
-  width: number;
-  height: number;
-  wide?: boolean;
-}) {
+/** A real product screenshot in a quiet, paper-like frame, sized to fill its
+ *  grid column rather than capped to a decorative thumbnail width — these
+ *  screenshots need to be read, not just glanced at. Width/height are each
+ *  image's true captured size (not a shared guess), so Next/Image reserves
+ *  the correct space before load and nothing jumps into place once the
+ *  image resolves. */
+function Screen({ src, alt, width, height }: { src: string; alt: string; width: number; height: number }) {
   return (
-    <div
-      className={`mx-auto w-full overflow-hidden rounded-2xl border border-line bg-surface shadow-lg ${
-        wide ? "max-w-[560px]" : "max-w-[380px]"
-      }`}
-    >
-      <Image src={src} alt={alt} width={width} height={height} className="h-auto w-full" />
+    <div className="w-full overflow-hidden rounded-2xl border border-line bg-surface shadow-lg">
+      <Image
+        src={src}
+        alt={alt}
+        width={width}
+        height={height}
+        sizes="(min-width: 640px) 60vw, 100vw"
+        className="h-auto w-full"
+      />
     </div>
   );
 }
@@ -79,40 +72,38 @@ const STEPS = [
   {
     n: "1",
     title: "Name what matters",
-    copy: "A practice is anything worth showing up for — writing, Qur'an study, reading, training, deep work. You define it; Daily Proof doesn't tell you what counts.",
+    copy: "A practice is anything worth showing up for: writing, Qur'an study, reading, training, deep work. You define it. Daily Proof doesn't tell you what counts.",
     src: "/screens/studio.png",
     alt: "Choosing today's focus in Daily Proof Studio",
-    width: 1280,
-    height: 558,
-    wide: true,
+    width: 2560,
+    height: 1116,
   },
   {
     n: "2",
     title: "Focus, without deciding twice",
-    copy: "Start an open-ended Stopwatch, or set a Timer — 25, 45, 90 minutes, or your own. Reaching zero doesn't end anything automatically; you decide when the session is done.",
+    copy: "Start an open-ended Stopwatch, or set a Timer for 25, 45, 90 minutes, or your own choice. Reaching zero doesn't end anything automatically. You decide when the session is done.",
     src: "/screens/focus.png",
     alt: "A Timer session counting down in Daily Proof Focus mode",
-    width: 900,
-    height: 700,
+    width: 1800,
+    height: 1400,
   },
   {
     n: "3",
     title: "Say what actually happened",
-    copy: "A few honest lines while it's still fresh. Not a report for anyone — a private note to yourself about what the session was really like.",
+    copy: "A few honest lines while it's still fresh. Not a report for anyone. Just a private note to yourself about what the session was really like.",
     src: "/screens/reflect.png",
     alt: "Reflecting on a finished session in Daily Proof",
-    width: 900,
-    height: 700,
+    width: 1800,
+    height: 1400,
   },
   {
     n: "4",
     title: "Keep the record",
-    copy: "Every finished session becomes a page. No streaks, no percentages, no comparison to other days — just an honest, browsable account of your work.",
+    copy: "Every finished session becomes a page. No streaks, no percentages, no comparison to other days. Just an honest, browsable account of your work.",
     src: "/screens/book.png",
     alt: "A day of saved proof in the Daily Proof Book",
-    width: 1280,
-    height: 570,
-    wide: true,
+    width: 2560,
+    height: 1140,
   },
 ];
 
@@ -136,13 +127,20 @@ export default function LandingPage() {
             A private place to focus, reflect, and keep an honest record of what you actually did.
           </p>
           <div className="mx-auto mt-8 flex w-full max-w-sm flex-col items-center justify-center gap-3 sm:max-w-none sm:flex-row">
-            <a href="/studio" className="btn-primary w-full px-8 py-4 text-[16px] sm:w-auto">
-              Open Daily Proof
+            <a href="#pricing" className="btn-primary w-full px-8 py-4 text-[16px] sm:w-auto">
+              Get Daily Proof
             </a>
             <a href="#how" className="btn-quiet w-full px-8 py-4 text-[16px] sm:w-auto">
               See how it works
             </a>
           </div>
+          <p className="mt-4 text-[13px] text-ink-faint">
+            Already have a plan?{" "}
+            <a href="/studio" className="underline underline-offset-2 hover:text-ink">
+              Open the app
+            </a>
+            .
+          </p>
         </div>
         <p className="pb-8 text-center text-[13px] text-ink-faint" aria-hidden>
           Scroll to see how it works ↓
@@ -157,13 +155,13 @@ export default function LandingPage() {
             <div className="mx-auto mt-6 max-w-[58ch] space-y-4 text-center text-[16.5px] leading-relaxed text-ink-soft">
               <p>
                 Most tools built for focus and habits are optimized to keep you coming back to
-                them — a streak to protect, a dashboard to check, a notification to open. That is
+                them: a streak to protect, a dashboard to check, a notification to open. That is
                 a different goal than doing the work.
               </p>
               <p>
                 Daily Proof was built to answer one question honestly: did the work happen? Not
-                how many days in a row. Not how today compares to yesterday. Just — did you show
-                up, and for how long.
+                how many days in a row. Not how today compares to yesterday. Just this: did you
+                show up, and for how long.
               </p>
               <p className="font-medium text-ink">
                 It keeps that record quietly, on your own device, and asks nothing else of you.
@@ -175,31 +173,41 @@ export default function LandingPage() {
 
       {/* ---------- 3 · How it works ---------- */}
       <section id="how" className="border-t border-line bg-surface2/40 scroll-mt-16">
-        <div className="mx-auto w-full max-w-4xl px-6 py-20 sm:py-28">
+        <div className="mx-auto w-full max-w-6xl px-6 py-20 sm:py-28">
           <Reveal>
             <h2 className="text-center font-display text-3xl font-semibold">How it works</h2>
           </Reveal>
-          <div className="mt-14 space-y-16 sm:space-y-20">
-            {STEPS.map((s, i) => (
-              <Reveal key={s.n}>
-                <div
-                  className={`grid items-center gap-8 sm:grid-cols-2 sm:gap-12 ${
-                    i % 2 === 1 ? "sm:[&>*:first-child]:order-2" : ""
-                  }`}
-                >
-                  <div className="text-center sm:text-left">
-                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-ember/10 font-display text-[15px] font-semibold text-ember-ink">
-                      {s.n}
-                    </span>
-                    <h3 className="mt-4 font-display text-2xl font-semibold">{s.title}</h3>
-                    <p className="mx-auto mt-2.5 max-w-[40ch] text-[15.5px] leading-relaxed text-ink-soft sm:mx-0">
-                      {s.copy}
-                    </p>
+          <div className="mt-14 space-y-16 sm:space-y-24">
+            {STEPS.map((s, i) => {
+              // The screenshot is what actually explains the product, so it
+              // always gets the wider column (3fr vs 2fr) — which physical
+              // side that lands on alternates per step for visual rhythm,
+              // controlled by flipping the track order, not by shrinking
+              // the image back down to match the caption's width.
+              const imageRight = i % 2 === 0;
+              return (
+                <Reveal key={s.n}>
+                  <div
+                    className={`grid items-center gap-8 sm:gap-12 ${
+                      imageRight ? "sm:grid-cols-[2fr_3fr]" : "sm:grid-cols-[3fr_2fr]"
+                    }`}
+                  >
+                    <div
+                      className={`text-center sm:text-left ${imageRight ? "" : "sm:order-2"}`}
+                    >
+                      <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-ember/10 font-display text-[15px] font-semibold text-ember-ink">
+                        {s.n}
+                      </span>
+                      <h3 className="mt-4 font-display text-2xl font-semibold">{s.title}</h3>
+                      <p className="mx-auto mt-2.5 max-w-[38ch] text-[15.5px] leading-relaxed text-ink-soft sm:mx-0">
+                        {s.copy}
+                      </p>
+                    </div>
+                    <Screen src={s.src} alt={s.alt} width={s.width} height={s.height} />
                   </div>
-                  <Screen src={s.src} alt={s.alt} width={s.width} height={s.height} wide={s.wide} />
-                </div>
-              </Reveal>
-            ))}
+                </Reveal>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -212,7 +220,7 @@ export default function LandingPage() {
             <div className="mx-auto mt-6 max-w-[58ch] space-y-4 text-center text-[16.5px] leading-relaxed text-ink-soft">
               <p>
                 There is no streak to protect here, and no chain to break. A day with nothing
-                logged is not failure data — it is just a day with nothing logged.
+                logged is not failure data. It is just a day with nothing logged.
               </p>
               <p className="font-medium text-ink">
                 What Daily Proof keeps is evidence of what happened, not a performance of what you
@@ -240,7 +248,7 @@ export default function LandingPage() {
                 or sold. It even works offline, because everything it needs is already here.
               </p>
               <p className="font-medium text-ink">
-                A promise can change. This can&rsquo;t — there&rsquo;s nothing here to sell,
+                A promise can change. This can&rsquo;t. There&rsquo;s nothing here to sell,
                 because your proof was never something we could see.
               </p>
             </div>
@@ -256,13 +264,13 @@ export default function LandingPage() {
               <div>
                 <h2 className="font-display text-3xl font-semibold">Your proof, made real</h2>
                 <p className="mt-5 max-w-[42ch] text-[16.5px] leading-relaxed text-ink-soft">
-                  Any finished session can become a card — the practice, the duration, a line
-                  worth remembering, set on paper that shifts with when you did the work: morning
-                  light, midday clarity, sunset amber, or quiet charcoal at night.
+                  Any finished session can become a card: the practice, the duration, a line worth
+                  remembering, set on paper that shifts with when you did the work. Morning light,
+                  midday clarity, sunset amber, or quiet charcoal at night.
                 </p>
                 <p className="mt-4 max-w-[42ch] text-[16.5px] leading-relaxed text-ink-soft">
                   It isn&rsquo;t a trophy. It&rsquo;s just what the work looked like, made real
-                  enough to keep — or to send to the one person who&rsquo;d understand why it
+                  enough to keep, or to send to the one person who&rsquo;d understand why it
                   mattered.
                 </p>
               </div>
@@ -286,7 +294,7 @@ export default function LandingPage() {
           <Reveal>
             <h2 className="text-center font-display text-3xl font-semibold">Pricing</h2>
             <p className="mx-auto mt-3 max-w-[46ch] text-center text-[15.5px] leading-relaxed text-ink-soft">
-              One plan, two ways to pay for it. Every feature is included either way — Timer and
+              One plan, two ways to pay for it. Every feature is included either way: Timer and
               Stopwatch, the Book, backups, sharing.
             </p>
             <div className="mt-10">
