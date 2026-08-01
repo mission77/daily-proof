@@ -13,12 +13,12 @@ type State = "restoring" | "ready" | "failed";
 const FAILURE_MESSAGES: Record<string, string> = {
   missing_token: "This restore link is incomplete. Request a new one from the access screen.",
   invalid_or_expired_link:
-    "This restore link has expired or was already used. Restore links are valid for 20 minutes — request a new one.",
+    "This restore link has expired or was already used. Restore links are valid for 20 minutes. Request a new one.",
   no_active_purchase:
     "We couldn't find an active Daily Proof purchase for this link. If you believe this is wrong, contact support.",
   not_configured: "Restoring access isn't available on this deployment right now.",
   stripe_unavailable: "We couldn't reach Stripe to confirm your purchase. Please try again in a moment.",
-  rate_limited: "Too many attempts — please wait a moment and try again.",
+  rate_limited: "Too many attempts. Wait a moment and try again.",
   invalid_body: "Something went wrong confirming this link. Please try reloading this page.",
 };
 const DEFAULT_FAILURE = "This restore link couldn't be confirmed. Request a new one from the access screen.";
@@ -94,7 +94,7 @@ function ConfirmInner() {
           <h1 className="mt-6 font-display text-2xl font-semibold">Access restored.</h1>
           <p className="mt-2 text-[15px] text-ink-soft">{planLabel} is active on this device.</p>
           <p className="mx-auto mt-3 max-w-sm text-[13.5px] leading-relaxed text-ink-faint">
-            This restored your plan, not your proof — proof only ever lived on the device that
+            This restored your plan, not your proof. Proof only ever lived on the device that
             created it. If you have a backup file from that device, import it from Settings →
             Backup.
           </p>

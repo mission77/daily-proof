@@ -255,7 +255,7 @@ export default function SettingsPage() {
           {canManageBilling && (
             <p className="mt-2 text-[12.5px] text-ink-faint">
               Opens Stripe&rsquo;s secure billing portal, where you can cancel your subscription,
-              update your payment method, or view billing history — no need to contact support.
+              update your payment method, or view billing history. No need to contact support.
             </p>
           )}
           <div className="mt-4 border-t border-line pt-4">
@@ -271,7 +271,7 @@ export default function SettingsPage() {
               />
             </div>
             <p className="mt-2 text-[12.5px] text-ink-faint">
-              Entering a new code replaces your current one. No account needed — the code is your key.
+              Entering a new code replaces your current one. No account needed. The code is your key.
             </p>
           </div>
           {!BETA_MODE && (
@@ -298,14 +298,14 @@ export default function SettingsPage() {
         </h2>
         <div className="card mt-2.5 p-5">
           <p className="text-[14px] text-ink-soft">
-            Everything lives in this browser&rsquo;s local storage — there is no cloud backup, on
-            any plan. A backup is a single JSON file with your practices, proof, and settings;
-            exporting one is the only copy that exists anywhere else.
+            Everything lives in this browser&rsquo;s local storage: there is no cloud backup, on
+            any plan. A backup is a single JSON file with your practices, proof, and settings.
+            Exporting one is the only copy that exists anywhere else.
           </p>
           <p className="mt-2 text-[13px] text-ink-faint">
-            A browser can clear local storage without warning — low disk space, private
-            browsing, an uninstall — and without a recent export, that proof can&rsquo;t be
-            recovered. Import brings a backup onto a new device or browser.
+            A browser can clear local storage without warning: low disk space, private browsing,
+            an uninstall, and without a recent export, that proof can&rsquo;t be recovered. Import
+            brings a backup onto a new device or browser.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
             <button className="btn-quiet" onClick={exportBackup}>
@@ -338,8 +338,8 @@ export default function SettingsPage() {
         <div className="card mt-2.5 p-5">
           <p className="text-[15px]">Your proof never leaves this device.</p>
           <p className="mt-1.5 text-[14px] text-ink-soft">
-            Everything is stored locally in your browser. There is no account, no server, and no
-            tracking. The only copy that exists elsewhere is the one you export yourself.
+            Stored locally in your browser. No account, no server, no tracking. The only copy
+            anywhere else is the one you export.
           </p>
         </div>
       </section>
@@ -356,7 +356,7 @@ export default function SettingsPage() {
             </p>
           </div>
           <p className="mt-0.5 text-[14px] text-ink-soft">
-            Collect proof of meaningful work. Not streaks, not points — proof.
+            Collect proof of meaningful work. Not streaks, not points. Proof.
           </p>
           <div className="mt-2.5 flex items-center justify-between text-[13px] text-ink-faint">
             <span>Version 1.0.0</span>

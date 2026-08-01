@@ -112,15 +112,15 @@ export function AccessGuard({ children }: { children: React.ReactNode }) {
                 Unlock Daily Proof on this device.
               </h1>
               <p className="mx-auto mt-2 max-w-md text-[15px] leading-relaxed text-ink-soft">
-                Studio and Book need an active plan or access code. Settings — including
-                exporting your data — is always open, no code required.
+                Studio and Book need an active plan or access code. Settings, including exporting
+                your data, is always open, no code required.
               </p>
             </>
           )}
           {expiredPremium && (
             <p className="mx-auto mt-3 max-w-md text-[13.5px] leading-relaxed text-ink-faint">
               Your subscription access could not be renewed. If you&rsquo;re still subscribed, this
-              should resolve automatically — otherwise, redeem a new code below.
+              should resolve automatically. Otherwise, redeem a new code below.
             </p>
           )}
           <div className="mx-auto mt-7 max-w-md text-left">

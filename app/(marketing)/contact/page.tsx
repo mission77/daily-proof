@@ -13,7 +13,7 @@ export default function ContactPage() {
       <h1 className="font-display text-4xl font-semibold">Contact</h1>
       <p className="mx-auto mt-4 max-w-md leading-relaxed text-ink-soft">
         Daily Proof is built by a small team that reads everything. Questions, billing, feedback,
-        or just to say the app helped — one address covers it all:
+        or just to say the app helped: one address covers it all.
       </p>
       <a href={`mailto:${SUPPORT_EMAIL}`} className="btn-primary mt-8 inline-flex px-7 py-3 text-[16px]">
         {SUPPORT_EMAIL}

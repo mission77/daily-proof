@@ -21,7 +21,7 @@ export default function RefundsPage() {
       <h2 className="mt-10 font-display text-xl font-semibold">Lifetime purchases</h2>
       <p className="mt-3 leading-relaxed text-ink-soft">
         If the lifetime plan isn&rsquo;t right for you, email us within 14 days of purchase and we
-        will refund it in full — no questionnaire, no hoops.
+        will refund it in full. No questionnaire, no hoops.
       </p>
 
       <h2 className="mt-10 font-display text-xl font-semibold">Monthly subscriptions</h2>
@@ -40,7 +40,7 @@ export default function RefundsPage() {
       </p>
 
       <p className="mt-8 leading-relaxed text-ink-soft">
-        Your data is unaffected by refunds either way — it lives on your device and remains
+        Your data is unaffected by refunds either way. It lives on your device and stays
         exportable.
       </p>
     </article>

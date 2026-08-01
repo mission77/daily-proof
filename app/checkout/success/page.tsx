@@ -20,15 +20,15 @@ const FAILURE_MESSAGES: Record<string, string> = {
   unsupported_product:
     "This purchase couldn't be matched to a Daily Proof plan. If you were charged, contact support and it will be made right.",
   invalid_subscription:
-    "We couldn't confirm an active subscription for this purchase. If you were charged, it will settle shortly — try reloading, or contact support.",
+    "We couldn't confirm an active subscription for this purchase. If you were charged, it will settle shortly. Try reloading, or contact support.",
   incomplete_payment: "Payment wasn't completed, so nothing was charged.",
   not_configured: "Payments aren't available on this deployment right now.",
   stripe_unavailable: "We couldn't reach Stripe to confirm your purchase. Please try again in a moment.",
-  rate_limited: "Too many attempts — please wait a moment and reload this page.",
+  rate_limited: "Too many attempts. Wait a moment and reload this page.",
 };
 
 const DEFAULT_FAILURE =
-  "Your purchase could not be confirmed. If you were charged, it will settle shortly — try reloading, or reach out and it will be made right.";
+  "Your purchase could not be confirmed. If you were charged, it will settle shortly. Try reloading, or reach out and it will be made right.";
 
 function SuccessInner() {
   const params = useSearchParams();
@@ -120,7 +120,7 @@ function SuccessInner() {
             </p>
           )}
           <p className="mx-auto mt-3 max-w-sm text-[13px] leading-relaxed text-ink-faint">
-            Your proof stays on this device only — nothing syncs automatically. Export a backup
+            Your proof stays on this device only. Nothing syncs automatically. Export a backup
             from Settings to protect or move it.
             {isSubscription && " You can cancel anytime from Settings → Access."}
           </p>

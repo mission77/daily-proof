@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { SessionEntry } from "@/lib/types";
 import { deleteSession, editSessionNote, listSessionsForDay } from "@/lib/repos/sessions";
-import { formatDayHeading, formatDuration, formatTimeOfDay, isSameLocalDay } from "@/lib/time";
+import { formatDayHeading, formatDayHeadingShort, formatDuration, formatTimeOfDay, isSameLocalDay } from "@/lib/time";
 import { useToast } from "@/components/Toast";
 import { BackupReminder } from "@/components/BackupReminder";
 
@@ -94,7 +94,8 @@ export default function BookPage() {
       {/* Page header: the date is the page */}
       <div className="flex items-center justify-between gap-3">
         <h1 className="font-display text-[26px] font-semibold leading-tight sm:text-3xl">
-          {date ? formatDayHeading(date) : " "}
+          <span className="sm:hidden">{date ? formatDayHeadingShort(date) : " "}</span>
+          <span className="hidden sm:inline">{date ? formatDayHeading(date) : " "}</span>
         </h1>
         <div className="flex shrink-0 gap-1.5">
           <button className="btn-quiet px-3.5 py-2" aria-label="Previous day" onClick={() => go(-1)}>

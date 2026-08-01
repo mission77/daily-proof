@@ -72,7 +72,7 @@ const STEPS = [
   {
     n: "1",
     title: "Name what matters",
-    copy: "A practice is anything worth showing up for: writing, Qur'an study, reading, training, deep work. You define it. Daily Proof doesn't tell you what counts.",
+    copy: "Anything worth showing up for: writing, Qur'an study, reading, training, deep work. You define it.",
     src: "/screens/studio.png",
     alt: "Choosing today's focus in Daily Proof Studio",
     width: 2560,
@@ -80,8 +80,8 @@ const STEPS = [
   },
   {
     n: "2",
-    title: "Focus, without deciding twice",
-    copy: "Start an open-ended Stopwatch, or set a Timer for 25, 45, 90 minutes, or your own choice. Reaching zero doesn't end anything automatically. You decide when the session is done.",
+    title: "Focus, or log it after the fact",
+    copy: "Run an open Stopwatch, set a Timer, or log a session you already finished elsewhere. However it happened, it counts.",
     src: "/screens/focus.png",
     alt: "A Timer session counting down in Daily Proof Focus mode",
     width: 1800,
@@ -90,7 +90,7 @@ const STEPS = [
   {
     n: "3",
     title: "Say what actually happened",
-    copy: "A few honest lines while it's still fresh. Not a report for anyone. Just a private note to yourself about what the session was really like.",
+    copy: "A few honest lines while it's fresh. Not a report. A private note to yourself.",
     src: "/screens/reflect.png",
     alt: "Reflecting on a finished session in Daily Proof",
     width: 1800,
@@ -99,7 +99,7 @@ const STEPS = [
   {
     n: "4",
     title: "Keep the record",
-    copy: "Every finished session becomes a page. No streaks, no percentages, no comparison to other days. Just an honest, browsable account of your work.",
+    copy: "Every session becomes a page. No streaks, no percentages, no comparisons. Just an honest, browsable record.",
     src: "/screens/book.png",
     alt: "A day of saved proof in the Daily Proof Book",
     width: 2560,
@@ -147,31 +147,7 @@ export default function LandingPage() {
         </p>
       </section>
 
-      {/* ---------- 2 · Why it exists ---------- */}
-      <section className="border-t border-line">
-        <div className="mx-auto w-full max-w-2xl px-6 py-20 sm:py-28">
-          <Reveal>
-            <h2 className="text-center font-display text-3xl font-semibold">Why it exists</h2>
-            <div className="mx-auto mt-6 max-w-[58ch] space-y-4 text-center text-[16.5px] leading-relaxed text-ink-soft">
-              <p>
-                Most tools built for focus and habits are optimized to keep you coming back to
-                them: a streak to protect, a dashboard to check, a notification to open. That is
-                a different goal than doing the work.
-              </p>
-              <p>
-                Daily Proof was built to answer one question honestly: did the work happen? Not
-                how many days in a row. Not how today compares to yesterday. Just this: did you
-                show up, and for how long.
-              </p>
-              <p className="font-medium text-ink">
-                It keeps that record quietly, on your own device, and asks nothing else of you.
-              </p>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* ---------- 3 · How it works ---------- */}
+      {/* ---------- 2 · How it works ---------- */}
       <section id="how" className="border-t border-line bg-surface2/40 scroll-mt-16">
         <div className="mx-auto w-full max-w-6xl px-6 py-20 sm:py-28">
           <Reveal>
@@ -212,51 +188,45 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ---------- 4 · Proof, not performance ---------- */}
+      {/* ---------- 3 · Proof, not performance ---------- */}
       <section className="border-t border-line">
         <div className="mx-auto w-full max-w-2xl px-6 py-20 sm:py-28">
           <Reveal>
             <h2 className="text-center font-display text-3xl font-semibold">Proof, not performance</h2>
             <div className="mx-auto mt-6 max-w-[58ch] space-y-4 text-center text-[16.5px] leading-relaxed text-ink-soft">
               <p>
-                There is no streak to protect here, and no chain to break. A day with nothing
-                logged is not failure data. It is just a day with nothing logged.
+                Most tools optimize for coming back: a streak, a dashboard, a notification. Daily
+                Proof asks a simpler question. Did the work happen?
               </p>
               <p className="font-medium text-ink">
-                What Daily Proof keeps is evidence of what happened, not a performance of what you
-                intended. You don&rsquo;t perform for it. It just keeps the record.
+                Not how many days in a row. A quiet day isn&rsquo;t failure. It&rsquo;s just a
+                quiet day. You don&rsquo;t perform for this app. It just keeps the record.
               </p>
             </div>
           </Reveal>
         </div>
       </section>
 
-      {/* ---------- 5 · A fact, not a promise ---------- */}
+      {/* ---------- 4 · A fact, not a promise ---------- */}
       <section className="border-t border-line bg-surface2/40">
         <div className="mx-auto w-full max-w-2xl px-6 py-20 sm:py-28">
           <Reveal>
             <h2 className="text-center font-display text-3xl font-semibold">A fact, not a promise</h2>
             <div className="mx-auto mt-6 max-w-[58ch] space-y-4 text-center text-[16.5px] leading-relaxed text-ink-soft">
               <p>
-                There is no account, because your reflections are not a data asset to attach one
-                to. There is no server holding your proof, because a server is just a promise that
-                someone else won&rsquo;t have a bad day, get acquired, or get breached.
-              </p>
-              <p>
-                Every session and every note stays in this browser, on this device, until you
-                choose to export it. Nothing syncs automatically. Nothing is analyzed, profiled,
-                or sold. It even works offline, because everything it needs is already here.
+                There&rsquo;s no account, because your reflections aren&rsquo;t a data asset. There&rsquo;s
+                no server holding your proof, because a server is just a promise someone could break.
               </p>
               <p className="font-medium text-ink">
-                A promise can change. This can&rsquo;t. There&rsquo;s nothing here to sell,
-                because your proof was never something we could see.
+                Everything stays on this device until you export it. Nothing syncs. Nothing is
+                sold. It even works offline. A promise can change. This can&rsquo;t.
               </p>
             </div>
           </Reveal>
         </div>
       </section>
 
-      {/* ---------- 6 · Your proof, made real ---------- */}
+      {/* ---------- 5 · Your proof, made real ---------- */}
       <section className="border-t border-line">
         <div className="mx-auto w-full max-w-4xl px-6 py-20 sm:py-28">
           <Reveal>
@@ -264,14 +234,13 @@ export default function LandingPage() {
               <div>
                 <h2 className="font-display text-3xl font-semibold">Your proof, made real</h2>
                 <p className="mt-5 max-w-[42ch] text-[16.5px] leading-relaxed text-ink-soft">
-                  Any finished session can become a card: the practice, the duration, a line worth
-                  remembering, set on paper that shifts with when you did the work. Morning light,
-                  midday clarity, sunset amber, or quiet charcoal at night.
+                  Any session can become a card: practice, duration, a line worth remembering, on
+                  paper that shifts with the time of day. Morning light, midday clarity, sunset
+                  amber, charcoal at night.
                 </p>
                 <p className="mt-4 max-w-[42ch] text-[16.5px] leading-relaxed text-ink-soft">
-                  It isn&rsquo;t a trophy. It&rsquo;s just what the work looked like, made real
-                  enough to keep, or to send to the one person who&rsquo;d understand why it
-                  mattered.
+                  Not a trophy. Just what the work looked like, worth keeping or sending to the one
+                  person who&rsquo;d understand.
                 </p>
               </div>
               <div className="mx-auto w-full max-w-[280px] overflow-hidden rounded-2xl shadow-xl">
@@ -288,14 +257,13 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ---------- 7 · Pricing ---------- */}
+      {/* ---------- 6 · Pricing ---------- */}
       <section id="pricing" className="border-t border-line bg-surface2/40 scroll-mt-16">
         <div className="mx-auto w-full max-w-2xl px-6 py-20 sm:py-28">
           <Reveal>
             <h2 className="text-center font-display text-3xl font-semibold">Pricing</h2>
             <p className="mx-auto mt-3 max-w-[46ch] text-center text-[15.5px] leading-relaxed text-ink-soft">
-              One plan, two ways to pay for it. Every feature is included either way: Timer and
-              Stopwatch, the Book, backups, sharing.
+              Two ways to pay. Every feature included either way.
             </p>
             <div className="mt-10">
               <PlanPicker />
@@ -304,7 +272,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ---------- 8 · FAQ ---------- */}
+      {/* ---------- 7 · FAQ ---------- */}
       <section className="border-t border-line">
         <div className="mx-auto w-full max-w-2xl px-6 py-20 sm:py-28">
           <Reveal>

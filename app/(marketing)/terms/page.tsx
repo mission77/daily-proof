@@ -25,7 +25,7 @@ export default function TermsPage() {
       <p className="mt-3 leading-relaxed text-ink-soft">
         Your content is stored on your device, not on our servers. You own it entirely. Because we
         hold no copy, we cannot recover data lost through cleared browser storage, lost devices, or
-        deleted backups — the app&rsquo;s export feature exists so you can protect yourself, and we
+        deleted backups. The app&rsquo;s export feature exists so you can protect yourself. We
         strongly recommend regular backups.
       </p>
 

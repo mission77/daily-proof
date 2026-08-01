@@ -42,7 +42,7 @@ export default function UpgradePage({
           <>
         {canceled && (
           <p className="mx-auto mb-6 rounded-xl border border-line bg-surface2/60 px-4 py-2.5 text-center text-[14px] text-ink-soft">
-            Checkout was cancelled — nothing was charged. Whenever you&rsquo;re ready.
+            Checkout was cancelled. Nothing was charged. Whenever you&rsquo;re ready.
           </p>
         )}
         <h1 className="text-center font-display text-[26px] font-semibold leading-tight sm:text-3xl">

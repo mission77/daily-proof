@@ -76,7 +76,6 @@ test("every promised section is present and in order", async ({ page }) => {
   await page.goto("/");
   const headings = await page.getByRole("heading", { level: 2 }).allInnerTexts();
   expect(headings).toEqual([
-    "Why it exists",
     "How it works",
     "Proof, not performance",
     "A fact, not a promise",

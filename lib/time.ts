@@ -34,6 +34,20 @@ export function formatDayHeading(date: Date): string {
   return date.toLocaleDateString(undefined, { weekday: "long", year: "numeric", month: "long", day: "numeric" });
 }
 
+/** Same day logic as formatDayHeading, but short enough to never wrap on a
+ *  phone-width header: "Today", "Yesterday", or "Wed, Jul 29" (year added
+ *  only once it's no longer the current one). */
+export function formatDayHeadingShort(date: Date): string {
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+  if (isSameLocalDay(date, today)) return "Today";
+  if (isSameLocalDay(date, yesterday)) return "Yesterday";
+  return date.getFullYear() === today.getFullYear()
+    ? date.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })
+    : date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+}
+
 export function isSameLocalDay(a: Date, b: Date): boolean {
   return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
 }

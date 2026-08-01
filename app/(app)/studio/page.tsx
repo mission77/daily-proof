@@ -24,6 +24,8 @@ import {
 import { primeAudioContext } from "@/lib/completionSound";
 import { PracticeForm } from "@/components/PracticeForm";
 import { TimerSetup, TimerChoice } from "@/components/TimerSetup";
+import { LogSessionForm, LogSessionInput } from "@/components/LogSessionForm";
+import { saveProof } from "@/lib/repos/sessions";
 import { useToast } from "@/components/Toast";
 
 const EVIDENCE_LABEL: Record<string, string> = {
@@ -42,6 +44,7 @@ export default function StudioPage() {
   const [active, setActive] = useState<ActiveSession | undefined>();
   const [formTarget, setFormTarget] = useState<Practice | "new" | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<Practice | null>(null);
+  const [logging, setLogging] = useState(false);
   const [initialMode, setInitialMode] = useState<SessionMode>("stopwatch");
   const [initialMinutes, setInitialMinutes] = useState(25);
   const [choice, setChoice] = useState<TimerChoice>({ mode: "stopwatch" });
@@ -115,6 +118,28 @@ export default function StudioPage() {
       await setLastTimerDurationMs(choice.plannedDurationMs);
     }
     router.push("/focus");
+  }
+
+  /** Same saveProof() call the Timer/Stopwatch flow ends with — a manually
+   *  logged session becomes an ordinary proof entry, not a lesser one.
+   *  mode stays unset, exactly like a Stopwatch session: nothing in Daily
+   *  Proof timed this, so there's no timer mode to record. */
+  async function handleLogSession(input: LogSessionInput) {
+    const p = practices.find((pr) => pr.id === input.practiceId);
+    if (!p) return;
+    await saveProof({
+      practiceId: p.id,
+      practiceNameSnapshot: p.name,
+      durationMs: input.durationMs,
+      completed: input.completed,
+      measurement: input.measurement,
+      measurementUnit: p.measurementUnit,
+      notes: input.notes,
+      startedAt: new Date(new Date(input.completedAt).getTime() - input.durationMs).toISOString(),
+      completedAt: input.completedAt,
+    });
+    setLogging(false);
+    toast("Proof saved");
   }
 
   async function chooseFocus(id: string) {
@@ -244,13 +269,18 @@ export default function StudioPage() {
                       setChoiceValid(valid);
                     }}
                   />
-                  <button
-                    className="btn-primary mt-4 w-full sm:w-auto"
-                    disabled={!choiceValid}
-                    onClick={() => startSession(focus)}
-                  >
-                    Start session
-                  </button>
+                  <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+                    <button
+                      className="btn-primary w-full sm:w-auto"
+                      disabled={!choiceValid}
+                      onClick={() => startSession(focus)}
+                    >
+                      Start session
+                    </button>
+                    <button className="btn-quiet w-full sm:w-auto" onClick={() => setLogging(true)}>
+                      Log session
+                    </button>
+                  </div>
                 </>
               )}
             </div>
@@ -375,6 +405,15 @@ export default function StudioPage() {
           practice={formTarget === "new" ? undefined : formTarget}
           onSave={handleSave}
           onClose={() => setFormTarget(null)}
+        />
+      )}
+
+      {logging && focus && (
+        <LogSessionForm
+          practices={activeList}
+          defaultPracticeId={focus.id}
+          onSave={handleLogSession}
+          onClose={() => setLogging(false)}
         />
       )}
 
