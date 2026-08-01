@@ -18,7 +18,13 @@ export interface SubscriptionBillingState {
  *  possibly-wrong renewal date. */
 export function subscriptionDetailLabel(sub: SubscriptionBillingState | null): string | null {
   if (!sub) return null;
-  const fmt = (iso: string) => new Date(iso).toLocaleDateString();
+  // Stripe's trial_end/current_period_end are exact instants (Unix
+  // timestamps), not calendar dates. Formatting without an explicit
+  // timeZone resolves the day using the viewer's local offset, which can
+  // land on a different calendar day than Stripe's own UTC-based billing
+  // surfaces for the same instant — the day must be read in UTC so this
+  // never drifts by a day depending on who's looking at it.
+  const fmt = (iso: string) => new Date(iso).toLocaleDateString(undefined, { timeZone: "UTC" });
   switch (sub.status) {
     case "trialing":
       return sub.trialEnd ? `First charge ${fmt(sub.trialEnd)}` : null;

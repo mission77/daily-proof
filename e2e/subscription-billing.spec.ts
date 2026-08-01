@@ -20,6 +20,14 @@ async function mockSubscription(page: Page, body: Record<string, unknown>, statu
   );
 }
 
+// Matches lib/billingDisplay.ts's own formatting exactly (UTC, not the
+// host machine's local timezone) — using anything else here would make
+// these expectations only accidentally correct on a UTC test runner,
+// which is exactly how the original day-shift bug went uncaught.
+function utcDate(iso: string): string {
+  return new Date(iso).toLocaleDateString(undefined, { timeZone: "UTC" });
+}
+
 const FUTURE_EXPIRES = new Date(Date.now() + 7 * 86_400_000).toISOString();
 
 test("trialing: Monthly, First charge on the trial end date", async ({ page }) => {
@@ -36,7 +44,7 @@ test("trialing: Monthly, First charge on the trial end date", async ({ page }) =
   await page.goto("/settings");
 
   await expect(accessCard(page).getByText("Monthly", { exact: true })).toBeVisible();
-  await expect(accessCard(page).getByText(`First charge ${new Date(trialEnd).toLocaleDateString()}`)).toBeVisible();
+  await expect(accessCard(page).getByText(`First charge ${utcDate(trialEnd)}`)).toBeVisible();
 });
 
 test("active, not canceling: Monthly, Renews on the current period end date", async ({ page }) => {
@@ -53,9 +61,7 @@ test("active, not canceling: Monthly, Renews on the current period end date", as
   await page.goto("/settings");
 
   await expect(accessCard(page).getByText("Monthly", { exact: true })).toBeVisible();
-  await expect(
-    accessCard(page).getByText(`Renews ${new Date(currentPeriodEnd).toLocaleDateString()}`)
-  ).toBeVisible();
+  await expect(accessCard(page).getByText(`Renews ${utcDate(currentPeriodEnd)}`)).toBeVisible();
 });
 
 test("active with cancel_at_period_end: Monthly, Access until the current period end date", async ({ page }) => {
@@ -72,9 +78,7 @@ test("active with cancel_at_period_end: Monthly, Access until the current period
   await page.goto("/settings");
 
   await expect(accessCard(page).getByText("Monthly", { exact: true })).toBeVisible();
-  await expect(
-    accessCard(page).getByText(`Access until ${new Date(currentPeriodEnd).toLocaleDateString()}`)
-  ).toBeVisible();
+  await expect(accessCard(page).getByText(`Access until ${utcDate(currentPeriodEnd)}`)).toBeVisible();
   await expect(accessCard(page).getByText(/^Renews/)).toHaveCount(0);
 });
 
@@ -128,7 +132,7 @@ test("Stripe unavailable: Monthly with no date, no error message, no fallback to
   await expect(accessCard(page).getByText(/Renews|Access until|First charge|Payment needs attention/)).toHaveCount(0);
   await expect(page.getByText(/error|unavailable|couldn't|failed/i)).toHaveCount(0);
   // The local rolling-cache date must never appear as billing information.
-  await expect(page.getByText(new Date(localExpiresAt).toLocaleDateString())).toHaveCount(0);
+  await expect(page.getByText(utcDate(localExpiresAt))).toHaveCount(0);
 });
 
 test("no accidental use of local expiresAt: the visible date always matches Stripe's, never the local cache", async ({
@@ -147,10 +151,8 @@ test("no accidental use of local expiresAt: the visible date always matches Stri
   });
   await page.goto("/settings");
 
-  await expect(
-    accessCard(page).getByText(`Renews ${new Date(stripeCurrentPeriodEnd).toLocaleDateString()}`)
-  ).toBeVisible();
-  await expect(page.getByText(new Date(localExpiresAt).toLocaleDateString())).toHaveCount(0);
+  await expect(accessCard(page).getByText(`Renews ${utcDate(stripeCurrentPeriodEnd)}`)).toBeVisible();
+  await expect(page.getByText(utcDate(localExpiresAt))).toHaveCount(0);
   await expect(page.getByText(/until 1\/1\/2099|until 6\/15\/2099/)).toHaveCount(0);
 });
 
@@ -186,4 +188,62 @@ test("Lifetime: 'Lifetime access', no billing line, no Stripe call", async ({ pa
   await expect(accessCard(page).getByText("Lifetime access", { exact: true })).toBeVisible();
   await expect(accessCard(page).getByText(/Renews|Access until|First charge|Payment needs attention/)).toHaveCount(0);
   expect(subscriptionRequests).toBe(0);
+});
+
+// Regression coverage for the "Daily Proof says Aug 2, Stripe Billing
+// Portal says Aug 3" report: Stripe's trial_end/current_period_end are
+// exact instants (Unix timestamps), not calendar dates. Formatting them
+// without an explicit UTC timeZone reads the calendar day using the
+// viewer's local offset, which can land a day earlier than Stripe's own
+// UTC-based rendering for the same instant. These timestamps are chosen so
+// a browser in America/Los_Angeles (UTC-7 in August) would show the
+// *previous* day if the bug were still present — the fix must show the
+// same, correct UTC day regardless of the viewer's timezone.
+const NEAR_UTC_MIDNIGHT_TRIAL_END = "2026-08-03T02:00:00.000Z"; // 7pm Aug 2 in America/Los_Angeles
+const NEAR_UTC_MIDNIGHT_PERIOD_END = "2026-09-03T01:15:00.000Z"; // 6:15pm Sep 2 in America/Los_Angeles
+
+test.describe("date rendering never shifts a day depending on the viewer's timezone", () => {
+  for (const timezoneId of ["America/Los_Angeles", "Pacific/Kiritimati", "UTC"]) {
+    test.describe(`viewer timezone: ${timezoneId}`, () => {
+      test.use({ timezoneId });
+
+      test("trialing shows Stripe's UTC trial-end day, not a locally shifted one", async ({ page }) => {
+        await page.goto("/");
+        await seedAccess(page, "premium", { token: "test-token", expiresAt: FUTURE_EXPIRES });
+        await mockSubscription(page, {
+          ok: true,
+          status: "trialing",
+          trialEnd: NEAR_UTC_MIDNIGHT_TRIAL_END,
+          currentPeriodEnd: null,
+          cancelAtPeriodEnd: false,
+        });
+        await page.goto("/settings");
+
+        await expect(accessCard(page).getByText("First charge 8/3/2026", { exact: true })).toBeVisible();
+      });
+
+      test("active renewal shows Stripe's UTC period-end day, not a locally shifted one", async ({ page }) => {
+        await page.goto("/");
+        await seedAccess(page, "premium", { token: "test-token", expiresAt: FUTURE_EXPIRES });
+        await mockSubscription(page, {
+          ok: true,
+          status: "active",
+          trialEnd: null,
+          currentPeriodEnd: NEAR_UTC_MIDNIGHT_PERIOD_END,
+          cancelAtPeriodEnd: false,
+        });
+        await page.goto("/settings");
+
+        await expect(accessCard(page).getByText("Renews 9/3/2026", { exact: true })).toBeVisible();
+      });
+
+      test("canceled and Lifetime still show no date at all, in any timezone", async ({ page }) => {
+        await page.goto("/");
+        await seedAccess(page, "lifetime");
+        await page.goto("/settings");
+        await expect(accessCard(page).getByText("Lifetime access", { exact: true })).toBeVisible();
+        await expect(accessCard(page).getByText(/\d{1,2}\/\d{1,2}\/\d{4}/)).toHaveCount(0);
+      });
+    });
+  }
 });
