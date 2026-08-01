@@ -10,6 +10,12 @@ export interface SubscriptionBillingState {
   trialEnd: string | null; // ISO
   currentPeriodEnd: string | null; // ISO
   cancelAtPeriodEnd: boolean;
+  /** IANA timezone string from the Stripe account's Dashboard settings
+   *  (see lib/stripe/accountTimezone.ts), or null. Stripe's own
+   *  customer-facing date rendering falls back account-timezone → UTC —
+   *  never plain UTC by default — so this must be honored the same way
+   *  here, or the displayed day can differ from the Billing Portal's. */
+  timezone: string | null;
 }
 
 /** Any status without a specific case here (canceled, unpaid, incomplete,
@@ -19,12 +25,12 @@ export interface SubscriptionBillingState {
 export function subscriptionDetailLabel(sub: SubscriptionBillingState | null): string | null {
   if (!sub) return null;
   // Stripe's trial_end/current_period_end are exact instants (Unix
-  // timestamps), not calendar dates. Formatting without an explicit
-  // timeZone resolves the day using the viewer's local offset, which can
-  // land on a different calendar day than Stripe's own UTC-based billing
-  // surfaces for the same instant — the day must be read in UTC so this
-  // never drifts by a day depending on who's looking at it.
-  const fmt = (iso: string) => new Date(iso).toLocaleDateString(undefined, { timeZone: "UTC" });
+  // timestamps), not calendar dates. Reading the calendar day in the
+  // viewer's own browser timezone — or in a hardcoded "UTC" guess — can
+  // both land on a different day than Stripe's Billing Portal, which
+  // renders in the Stripe *account's* configured timezone, UTC only when
+  // Stripe has no account timezone on record.
+  const fmt = (iso: string) => new Date(iso).toLocaleDateString(undefined, { timeZone: sub.timezone ?? "UTC" });
   switch (sub.status) {
     case "trialing":
       return sub.trialEnd ? `First charge ${fmt(sub.trialEnd)}` : null;

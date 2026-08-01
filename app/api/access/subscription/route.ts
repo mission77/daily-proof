@@ -4,6 +4,7 @@ import { getStripe, readStripeEnv } from "@/lib/stripe/server";
 import { verifyStripeLicenseWithRotation } from "@/lib/license/stripeLicense";
 import { verificationSecrets } from "@/lib/license/secrets";
 import { clientKey, rateLimit } from "@/lib/rateLimit";
+import { getAccountTimezone } from "@/lib/stripe/accountTimezone";
 
 export const runtime = "nodejs";
 
@@ -76,11 +77,18 @@ export async function POST(req: NextRequest) {
   const item = sub.items.data.find((i) => i.price.id === env.monthlyPriceId) ?? sub.items.data[0];
   const currentPeriodEnd = item?.current_period_end;
 
+  // The Billing Portal doesn't render these instants in UTC — Stripe's own
+  // documented fallback for customer-facing dates is account-timezone
+  // before UTC. A failed lookup here degrades to null (the client then
+  // formats in UTC), never to blocking the response.
+  const timezone = await getAccountTimezone(stripe);
+
   return NextResponse.json({
     ok: true,
     status: sub.status,
     trialEnd: sub.trial_end ? new Date(sub.trial_end * 1000).toISOString() : null,
     currentPeriodEnd: currentPeriodEnd ? new Date(currentPeriodEnd * 1000).toISOString() : null,
     cancelAtPeriodEnd: sub.cancel_at_period_end,
+    timezone,
   });
 }

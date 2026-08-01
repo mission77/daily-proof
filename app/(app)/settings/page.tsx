@@ -175,6 +175,7 @@ export default function SettingsPage() {
             trialEnd: data.trialEnd ?? null,
             currentPeriodEnd: data.currentPeriodEnd ?? null,
             cancelAtPeriodEnd: Boolean(data.cancelAtPeriodEnd),
+            timezone: data.timezone ?? null,
           });
         }
       } catch {

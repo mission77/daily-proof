@@ -20,13 +20,17 @@ async function mockSubscription(page: Page, body: Record<string, unknown>, statu
   );
 }
 
-// Matches lib/billingDisplay.ts's own formatting exactly (UTC, not the
-// host machine's local timezone) — using anything else here would make
-// these expectations only accidentally correct on a UTC test runner,
-// which is exactly how the original day-shift bug went uncaught.
-function utcDate(iso: string): string {
-  return new Date(iso).toLocaleDateString(undefined, { timeZone: "UTC" });
+// Matches lib/billingDisplay.ts's own formatting exactly: the Stripe
+// account's configured Dashboard timezone when the mocked response
+// includes one, UTC only when it doesn't (Stripe's own documented
+// fallback chain — see lib/stripe/accountTimezone.ts). Using the host
+// machine's local timezone here instead would make these expectations
+// only accidentally correct on whatever machine runs the suite, which is
+// exactly how the original day-shift bug went uncaught in the first place.
+function zoneDate(iso: string, timeZone: string | null): string {
+  return new Date(iso).toLocaleDateString(undefined, { timeZone: timeZone ?? "UTC" });
 }
+const utcDate = (iso: string) => zoneDate(iso, null);
 
 const FUTURE_EXPIRES = new Date(Date.now() + 7 * 86_400_000).toISOString();
 
@@ -191,50 +195,92 @@ test("Lifetime: 'Lifetime access', no billing line, no Stripe call", async ({ pa
 });
 
 // Regression coverage for the "Daily Proof says Aug 2, Stripe Billing
-// Portal says Aug 3" report: Stripe's trial_end/current_period_end are
-// exact instants (Unix timestamps), not calendar dates. Formatting them
-// without an explicit UTC timeZone reads the calendar day using the
-// viewer's local offset, which can land a day earlier than Stripe's own
-// UTC-based rendering for the same instant. These timestamps are chosen so
-// a browser in America/Los_Angeles (UTC-7 in August) would show the
-// *previous* day if the bug were still present — the fix must show the
-// same, correct UTC day regardless of the viewer's timezone.
-const NEAR_UTC_MIDNIGHT_TRIAL_END = "2026-08-03T02:00:00.000Z"; // 7pm Aug 2 in America/Los_Angeles
-const NEAR_UTC_MIDNIGHT_PERIOD_END = "2026-09-03T01:15:00.000Z"; // 6:15pm Sep 2 in America/Los_Angeles
+// Portal says Aug 3" report. Root cause: Stripe's own customer-facing date
+// rendering (documented for renewal-reminder emails, and confirmed by the
+// exact reported gap) falls back customer timezone → the timezone
+// configured on the Stripe account → UTC only as a last resort. Formatting
+// in plain UTC — the first attempted fix — does NOT reliably match the
+// Billing Portal; only the account's actual configured timezone does. This
+// instant is chosen so UTC and the account timezone below disagree on the
+// calendar day, the same shape as the real report:
+const ACCOUNT_TZ_DIVERGES_FROM_UTC_TRIAL_END = "2026-08-02T21:00:00.000Z"; // 9pm UTC Aug 2 -> 2:30am Aug 3 in Asia/Kolkata (UTC+5:30)
+const ACCOUNT_TZ_DIVERGES_FROM_UTC_PERIOD_END = "2026-09-02T22:00:00.000Z"; // 10pm UTC Sep 2 -> 3:30am Sep 3 in Asia/Kolkata
 
-test.describe("date rendering never shifts a day depending on the viewer's timezone", () => {
+test("trialing: uses the Stripe account's configured timezone, not UTC, matching the Billing Portal", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await seedAccess(page, "premium", { token: "test-token", expiresAt: FUTURE_EXPIRES });
+  await mockSubscription(page, {
+    ok: true,
+    status: "trialing",
+    trialEnd: ACCOUNT_TZ_DIVERGES_FROM_UTC_TRIAL_END,
+    currentPeriodEnd: null,
+    cancelAtPeriodEnd: false,
+    timezone: "Asia/Kolkata",
+  });
+  await page.goto("/settings");
+
+  await expect(accessCard(page).getByText("First charge 8/3/2026", { exact: true })).toBeVisible();
+  // The old "just force UTC" fix would have shown this instead — asserting
+  // its absence is what actually catches a regression back to that fix.
+  await expect(accessCard(page).getByText("First charge 8/2/2026")).toHaveCount(0);
+});
+
+test("active renewal: uses the Stripe account's configured timezone, not UTC", async ({ page }) => {
+  await page.goto("/");
+  await seedAccess(page, "premium", { token: "test-token", expiresAt: FUTURE_EXPIRES });
+  await mockSubscription(page, {
+    ok: true,
+    status: "active",
+    trialEnd: null,
+    currentPeriodEnd: ACCOUNT_TZ_DIVERGES_FROM_UTC_PERIOD_END,
+    cancelAtPeriodEnd: false,
+    timezone: "Asia/Kolkata",
+  });
+  await page.goto("/settings");
+
+  await expect(accessCard(page).getByText("Renews 9/3/2026", { exact: true })).toBeVisible();
+  await expect(accessCard(page).getByText("Renews 9/2/2026")).toHaveCount(0);
+});
+
+test("no Stripe account timezone on record: falls back to UTC, exactly as Stripe itself documents", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await seedAccess(page, "premium", { token: "test-token", expiresAt: FUTURE_EXPIRES });
+  await mockSubscription(page, {
+    ok: true,
+    status: "trialing",
+    trialEnd: ACCOUNT_TZ_DIVERGES_FROM_UTC_TRIAL_END,
+    currentPeriodEnd: null,
+    cancelAtPeriodEnd: false,
+    timezone: null,
+  });
+  await page.goto("/settings");
+
+  await expect(accessCard(page).getByText(`First charge ${utcDate(ACCOUNT_TZ_DIVERGES_FROM_UTC_TRIAL_END)}`, { exact: true })).toBeVisible();
+});
+
+test.describe("the displayed date depends only on the Stripe account's timezone, never the viewer's own", () => {
   for (const timezoneId of ["America/Los_Angeles", "Pacific/Kiritimati", "UTC"]) {
     test.describe(`viewer timezone: ${timezoneId}`, () => {
       test.use({ timezoneId });
 
-      test("trialing shows Stripe's UTC trial-end day, not a locally shifted one", async ({ page }) => {
+      test("trialing shows the same account-timezone day regardless of who's viewing", async ({ page }) => {
         await page.goto("/");
         await seedAccess(page, "premium", { token: "test-token", expiresAt: FUTURE_EXPIRES });
         await mockSubscription(page, {
           ok: true,
           status: "trialing",
-          trialEnd: NEAR_UTC_MIDNIGHT_TRIAL_END,
+          trialEnd: ACCOUNT_TZ_DIVERGES_FROM_UTC_TRIAL_END,
           currentPeriodEnd: null,
           cancelAtPeriodEnd: false,
+          timezone: "Asia/Kolkata",
         });
         await page.goto("/settings");
 
         await expect(accessCard(page).getByText("First charge 8/3/2026", { exact: true })).toBeVisible();
-      });
-
-      test("active renewal shows Stripe's UTC period-end day, not a locally shifted one", async ({ page }) => {
-        await page.goto("/");
-        await seedAccess(page, "premium", { token: "test-token", expiresAt: FUTURE_EXPIRES });
-        await mockSubscription(page, {
-          ok: true,
-          status: "active",
-          trialEnd: null,
-          currentPeriodEnd: NEAR_UTC_MIDNIGHT_PERIOD_END,
-          cancelAtPeriodEnd: false,
-        });
-        await page.goto("/settings");
-
-        await expect(accessCard(page).getByText("Renews 9/3/2026", { exact: true })).toBeVisible();
       });
 
       test("canceled and Lifetime still show no date at all, in any timezone", async ({ page }) => {
