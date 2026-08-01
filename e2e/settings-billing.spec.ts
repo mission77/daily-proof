@@ -36,7 +36,7 @@ test("Lifetime customer: Current plan reads Lifetime, no Manage subscription, re
   await seedAccess(page, "lifetime");
   await page.goto("/settings");
 
-  await expect(accessCard(page).getByText("Lifetime", { exact: true })).toBeVisible();
+  await expect(accessCard(page).getByText("Lifetime access", { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Manage subscription" })).toHaveCount(0);
   await expect(page.getByText(/Need to restore a purchase/)).toBeVisible();
 });
@@ -60,7 +60,7 @@ test("Manually issued Premium access code: labeled as access-code Premium, not a
   await seedAccess(page, "premium");
   await page.goto("/settings");
 
-  await expect(accessCard(page).getByText("Premium (access code)")).toBeVisible();
+  await expect(accessCard(page).getByText("Premium access code")).toBeVisible();
   await expect(accessCard(page).getByText("Premium", { exact: true })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Manage subscription" })).toHaveCount(0);
   await expect(page.getByText(/Need to restore a purchase/)).toBeVisible();

@@ -117,7 +117,10 @@ export function roleLabel(role: AccessRole): string {
 export function planLabel(state: AccessState): string {
   const role = effectiveRole(state);
   if (role === "premium") {
-    return state.license?.token ? "Monthly" : "Premium (access code)";
+    return state.license?.token ? "Monthly" : "Premium access code";
+  }
+  if (role === "lifetime") {
+    return "Lifetime access";
   }
   return roleLabel(role);
 }

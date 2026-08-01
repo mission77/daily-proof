@@ -13,6 +13,7 @@ import {
   restoreBackup,
 } from "@/lib/backup";
 import { getAccessState, planLabel, roleLabel, setAccessRole } from "@/lib/repos/access";
+import { SubscriptionBillingState, subscriptionDetailLabel } from "@/lib/billingDisplay";
 import { AccessCodeForm } from "@/components/AccessCodeForm";
 import { RestoreAccessNotice } from "@/components/RestoreAccessNotice";
 import { BETA_MODE } from "@/lib/site";
@@ -147,6 +148,44 @@ export default function SettingsPage() {
     access?.role === "premium" && access.license?.token ? access.license.token : null;
   const canManageBilling = stripePremiumToken !== null;
 
+  // Live Stripe billing state for the "Current plan" secondary line — never
+  // the local license's rolling expiresAt (see lib/billingDisplay.ts). Any
+  // failure (Stripe unreachable, not configured, subscription gone) simply
+  // leaves this null: Settings falls back to showing "Monthly" with no
+  // date, never an error, never the local cache value.
+  const [billing, setBilling] = useState<SubscriptionBillingState | null>(null);
+
+  useEffect(() => {
+    if (!stripePremiumToken) {
+      setBilling(null);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/access/subscription", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token: stripePremiumToken }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!cancelled && res.ok && data.ok) {
+          setBilling({
+            status: data.status,
+            trialEnd: data.trialEnd ?? null,
+            currentPeriodEnd: data.currentPeriodEnd ?? null,
+            cancelAtPeriodEnd: Boolean(data.cancelAtPeriodEnd),
+          });
+        }
+      } catch {
+        /* leave billing null: fails calm, not loud */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [stripePremiumToken]);
+
   async function openBillingPortal() {
     if (portalBusy || !stripePremiumToken) return;
     setPortalBusy(true);
@@ -241,9 +280,17 @@ export default function SettingsPage() {
               <p className="text-[15px] font-medium">Current plan</p>
               <p className="mt-0.5 text-[13.5px] text-ink-soft">
                 {access ? planLabel(access) : "…"}
-                {access?.license?.expiresAt &&
+                {/* A genuine fixed-expiry manual code (e.g. Beta) shows its
+                    real date here. A Stripe-derived Monthly subscription
+                    never does — its local expiresAt is a rolling 7-day
+                    offline-tolerance cache, not a billing date, so it gets
+                    the live Stripe detail line below instead. */}
+                {access?.license?.expiresAt && !stripePremiumToken &&
                   ` · until ${new Date(access.license.expiresAt).toLocaleDateString()}`}
               </p>
+              {stripePremiumToken && subscriptionDetailLabel(billing) && (
+                <p className="mt-0.5 text-[13.5px] text-ink-soft">{subscriptionDetailLabel(billing)}</p>
+              )}
             </div>
             {canManageBilling && (
               <button className="btn-quiet shrink-0" onClick={openBillingPortal} disabled={portalBusy}>
