@@ -6,7 +6,8 @@ import { SUPPORT_EMAIL } from "@/lib/site";
 const FAILURE_MESSAGES: Record<string, string> = {
   invalid_email: "Enter a valid email address.",
   rate_limited: "Too many attempts. Wait a few minutes and try again.",
-  not_configured: `Self-service restore isn't available right now — email ${SUPPORT_EMAIL} and it'll be sorted out directly.`,
+  invalid_body: "Something went wrong sending that. Please try again.",
+  not_configured: `Self-service restore isn't available right now. Email ${SUPPORT_EMAIL} and it'll be sorted out directly.`,
 };
 const DEFAULT_FAILURE = "Couldn't reach the server. Check your connection and try again.";
 

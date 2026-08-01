@@ -9,7 +9,7 @@ import { getActiveSession } from "@/lib/repos/settings";
 import { isUpdatePending } from "@/lib/updatePending";
 import { Wordmark } from "@/components/Wordmark";
 import { AccessCodeForm } from "@/components/AccessCodeForm";
-import { RestoreAccessForm } from "@/components/RestoreAccessForm";
+import { RestoreAccessNotice } from "@/components/RestoreAccessNotice";
 import { PlanPicker } from "@/components/PlanPicker";
 import { BETA_MODE } from "@/lib/site";
 import { useToast } from "@/components/Toast";
@@ -31,7 +31,6 @@ export function AccessGuard({ children }: { children: React.ReactNode }) {
   // (as opposed to never having had one) — lets the lock screen explain
   // *why* calmly instead of just showing the generic no-access copy.
   const [expiredPremium, setExpiredPremium] = useState(false);
-  const [showRestore, setShowRestore] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -133,16 +132,7 @@ export function AccessGuard({ children }: { children: React.ReactNode }) {
           </div>
           {!BETA_MODE && (
             <div className="mx-auto mt-4 max-w-md text-left">
-              {showRestore ? (
-                <RestoreAccessForm onClose={() => setShowRestore(false)} />
-              ) : (
-                <button
-                  className="text-[13px] text-ink-faint underline-offset-2 hover:text-ink hover:underline"
-                  onClick={() => setShowRestore(true)}
-                >
-                  Bought Premium on another device? Restore access
-                </button>
-              )}
+              <RestoreAccessNotice />
             </div>
           )}
           {BETA_MODE ? (

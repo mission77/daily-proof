@@ -14,7 +14,7 @@ import {
 } from "@/lib/backup";
 import { getAccessState, planLabel, roleLabel, setAccessRole } from "@/lib/repos/access";
 import { AccessCodeForm } from "@/components/AccessCodeForm";
-import { RestoreAccessForm } from "@/components/RestoreAccessForm";
+import { RestoreAccessNotice } from "@/components/RestoreAccessNotice";
 import { BETA_MODE } from "@/lib/site";
 import { STORES, idbClear } from "@/lib/db";
 import { clearActiveSession, getSoundEnabled, recordBackupTaken, setSoundEnabled } from "@/lib/repos/settings";
@@ -38,7 +38,6 @@ export default function SettingsPage() {
   const [importError, setImportError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [soundEnabled, setSoundEnabledState] = useState(true);
-  const [showRestore, setShowRestore] = useState(false);
 
   useEffect(() => {
     getAccessState().then(setAccess);
@@ -276,16 +275,7 @@ export default function SettingsPage() {
           </div>
           {!BETA_MODE && (
             <div className="mt-4 border-t border-line pt-4">
-              {showRestore ? (
-                <RestoreAccessForm onClose={() => setShowRestore(false)} />
-              ) : (
-                <button
-                  className="text-[13px] text-ink-faint underline-offset-2 hover:text-ink hover:underline"
-                  onClick={() => setShowRestore(true)}
-                >
-                  Bought Premium on another device? Restore access
-                </button>
-              )}
+              <RestoreAccessNotice />
             </div>
           )}
         </div>

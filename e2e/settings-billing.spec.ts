@@ -15,7 +15,7 @@ function accessCard(page: Page) {
 // subscription, a one-time Lifetime purchase, Owner, a manually issued
 // access code, Beta, and no plan at all.
 
-test("Monthly Stripe subscriber: Current plan reads Monthly, Manage subscription and Restore access both show", async ({
+test("Monthly Stripe subscriber: Current plan reads Monthly, Manage subscription shows, restore points to support", async ({
   page,
 }) => {
   await page.goto("/");
@@ -26,10 +26,10 @@ test("Monthly Stripe subscriber: Current plan reads Monthly, Manage subscription
   await expect(accessCard(page).getByText(/^Monthly/)).toBeVisible();
   await expect(accessCard(page).getByText("Premium", { exact: true })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Manage subscription" })).toBeVisible();
-  await expect(page.getByText(/Restore access/)).toBeVisible();
+  await expect(page.getByText(/Need to restore a purchase/)).toBeVisible();
 });
 
-test("Lifetime customer: Current plan reads Lifetime, no Manage subscription, Restore access still shows", async ({
+test("Lifetime customer: Current plan reads Lifetime, no Manage subscription, restore points to support", async ({
   page,
 }) => {
   await page.goto("/");
@@ -38,7 +38,7 @@ test("Lifetime customer: Current plan reads Lifetime, no Manage subscription, Re
 
   await expect(accessCard(page).getByText("Lifetime", { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Manage subscription" })).toHaveCount(0);
-  await expect(page.getByText(/Restore access/)).toBeVisible();
+  await expect(page.getByText(/Need to restore a purchase/)).toBeVisible();
 });
 
 test("Owner: Current plan reads Owner, not Premium, no Manage subscription", async ({ page }) => {
@@ -63,7 +63,7 @@ test("Manually issued Premium access code: labeled as access-code Premium, not a
   await expect(accessCard(page).getByText("Premium (access code)")).toBeVisible();
   await expect(accessCard(page).getByText("Premium", { exact: true })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Manage subscription" })).toHaveCount(0);
-  await expect(page.getByText(/Restore access/)).toBeVisible();
+  await expect(page.getByText(/Need to restore a purchase/)).toBeVisible();
 });
 
 test("Beta: Current plan reads Beta, no Manage subscription", async ({ page }) => {

@@ -28,25 +28,22 @@ test("header and mobile menu show the returning-customer action, not a purchase 
   await expect(mobileNav.getByRole("link", { name: /request early access/i })).toHaveCount(0);
 });
 
-test("hero distinguishes a new visitor's path from an existing customer's", async ({ page }) => {
+test("hero leads unambiguously with the new-visitor CTA", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText(
     "Collect proof that meaningful work happened"
   );
 
   // New visitor: primary CTA leads to the pricing section on this page, not
-  // straight into the app before a plan has been chosen.
+  // straight into the app before a plan has been chosen. The returning
+  // customer's "Open the app" path lives only in the header/mobile nav (see
+  // the test above) — the hero itself no longer duplicates it.
   const primaryCta = page.getByRole("link", { name: "Get Daily Proof" });
   await expect(primaryCta).toBeVisible();
   await expect(primaryCta).toHaveAttribute("href", "#pricing");
 
   await expect(page.getByRole("link", { name: "See how it works" })).toHaveAttribute("href", "#how");
-
-  // Existing customer: a small, clearly secondary link right under the
-  // purchase CTAs, so the distinction is obvious without reading the header.
-  const existingCustomerLink = page.getByRole("link", { name: "Open the app" }).last();
-  await expect(existingCustomerLink).toBeVisible();
-  await expect(existingCustomerLink).toHaveAttribute("href", "/studio");
+  await expect(page.getByText("Already have a plan?")).toHaveCount(0);
 });
 
 test("new-visitor journey: hero CTA reaches a real, live pricing section", async ({ page }) => {
@@ -69,7 +66,7 @@ test("existing-customer journey: header CTA reaches /studio, which offers unlock
   await expect(page.getByText("Unlock Daily Proof on this device.")).toBeVisible();
   await expect(page.getByText(/private beta|invited members/i)).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Start 3-day trial" })).toBeVisible();
-  await expect(page.getByText(/Restore access/)).toBeVisible();
+  await expect(page.getByText(/Need to restore a purchase/)).toBeVisible();
 });
 
 test("every promised section is present and in order", async ({ page }) => {
@@ -137,7 +134,10 @@ test("all four How It Works screenshots load, at a size large enough to read", a
     "A day of saved proof in the Daily Proof Book",
   ];
   for (const alt of alts) {
-    const img = page.getByAltText(alt);
+    // Each step now renders a mobile capture and a desktop capture sharing
+    // the same alt text, one hidden by CSS at any given width — scope to
+    // the one actually visible at this viewport (the desktop one, here).
+    const img = page.locator(`img[alt="${alt}"]:visible`);
     await img.scrollIntoViewIfNeeded();
     await expect(img).toBeVisible();
     const naturalWidth = await img.evaluate((el: HTMLImageElement) => el.naturalWidth);
@@ -157,13 +157,27 @@ test("real, generated share card image is present and loads", async ({ page }) =
   expect(naturalWidth).toBeGreaterThan(0);
 });
 
-test("no horizontal overflow at 390, 768, 1280, or 1440 widths", async ({ page }) => {
-  for (const width of [390, 768, 1280, 1440]) {
+test("no horizontal overflow at 375, 390, 768, 1280, or 1440 widths", async ({ page }) => {
+  for (const width of [375, 390, 768, 1280, 1440]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/");
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     expect(overflow).toBe(0);
   }
+});
+
+test("How It Works screenshots swap between mobile and desktop captures at the sm breakpoint", async ({ page }) => {
+  const alt = "Choosing today's focus in Daily Proof Studio";
+
+  await page.setViewportSize({ width: 375, height: 800 });
+  await page.goto("/");
+  await expect(page.locator(`img[alt="${alt}"][src*="studio-mobile"]`)).toBeVisible();
+  await expect(page.locator(`img[alt="${alt}"][src*="studio.png"]`)).toBeHidden();
+
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.reload();
+  await expect(page.locator(`img[alt="${alt}"][src*="studio.png"]`)).toBeVisible();
+  await expect(page.locator(`img[alt="${alt}"][src*="studio-mobile"]`)).toBeHidden();
 });
 
 test("AccessGuard lock screen reflects launch state, not beta", async ({ page }) => {

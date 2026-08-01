@@ -52,17 +52,47 @@ function AppJsonLd() {
  *  screenshots need to be read, not just glanced at. Width/height are each
  *  image's true captured size (not a shared guess), so Next/Image reserves
  *  the correct space before load and nothing jumps into place once the
- *  image resolves. */
-function Screen({ src, alt, width, height }: { src: string; alt: string; width: number; height: number }) {
+ *  image resolves.
+ *
+ *  Phones get a real phone screenshot, not a shrunk desktop one — the two
+ *  captures show different content at different aspect ratios (the mobile
+ *  shots are actual 390×844 captures of the app), so this is two separate
+ *  images swapped by CSS breakpoint (matching the Book page's mobile-date
+ *  pattern) rather than one image resized via `sizes`. */
+function Screen({
+  src,
+  mobileSrc,
+  alt,
+  width,
+  height,
+  mobileWidth,
+  mobileHeight,
+}: {
+  src: string;
+  mobileSrc: string;
+  alt: string;
+  width: number;
+  height: number;
+  mobileWidth: number;
+  mobileHeight: number;
+}) {
   return (
     <div className="w-full overflow-hidden rounded-2xl border border-line bg-surface shadow-lg">
+      <Image
+        src={mobileSrc}
+        alt={alt}
+        width={mobileWidth}
+        height={mobileHeight}
+        sizes="100vw"
+        className="h-auto w-full sm:hidden"
+      />
       <Image
         src={src}
         alt={alt}
         width={width}
         height={height}
-        sizes="(min-width: 640px) 60vw, 100vw"
-        className="h-auto w-full"
+        sizes="60vw"
+        className="hidden h-auto w-full sm:block"
       />
     </div>
   );
@@ -74,36 +104,48 @@ const STEPS = [
     title: "Name what matters",
     copy: "Anything worth showing up for: writing, Qur'an study, reading, training, deep work. You define it.",
     src: "/screens/studio.png",
+    mobileSrc: "/screens/studio-mobile.png",
     alt: "Choosing today's focus in Daily Proof Studio",
     width: 2560,
     height: 1116,
+    mobileWidth: 1170,
+    mobileHeight: 2532,
   },
   {
     n: "2",
     title: "Focus, or log it after the fact",
     copy: "Run an open Stopwatch, set a Timer, or log a session you already finished elsewhere. However it happened, it counts.",
     src: "/screens/focus.png",
+    mobileSrc: "/screens/focus-mobile.png",
     alt: "A Timer session counting down in Daily Proof Focus mode",
     width: 1800,
     height: 1400,
+    mobileWidth: 1170,
+    mobileHeight: 2532,
   },
   {
     n: "3",
     title: "Say what actually happened",
     copy: "A few honest lines while it's fresh. Not a report. A private note to yourself.",
     src: "/screens/reflect.png",
+    mobileSrc: "/screens/reflect-mobile.png",
     alt: "Reflecting on a finished session in Daily Proof",
     width: 1800,
     height: 1400,
+    mobileWidth: 1170,
+    mobileHeight: 2532,
   },
   {
     n: "4",
     title: "Keep the record",
     copy: "Every session becomes a page. No streaks, no percentages, no comparisons. Just an honest, browsable record.",
     src: "/screens/book.png",
+    mobileSrc: "/screens/book-mobile.png",
     alt: "A day of saved proof in the Daily Proof Book",
     width: 2560,
     height: 1140,
+    mobileWidth: 1170,
+    mobileHeight: 2532,
   },
 ];
 
@@ -134,13 +176,6 @@ export default function LandingPage() {
               See how it works
             </a>
           </div>
-          <p className="mt-4 text-[13px] text-ink-faint">
-            Already have a plan?{" "}
-            <a href="/studio" className="underline underline-offset-2 hover:text-ink">
-              Open the app
-            </a>
-            .
-          </p>
         </div>
         <p className="pb-8 text-center text-[13px] text-ink-faint" aria-hidden>
           Scroll to see how it works ↓
@@ -179,7 +214,15 @@ export default function LandingPage() {
                         {s.copy}
                       </p>
                     </div>
-                    <Screen src={s.src} alt={s.alt} width={s.width} height={s.height} />
+                    <Screen
+                      src={s.src}
+                      mobileSrc={s.mobileSrc}
+                      alt={s.alt}
+                      width={s.width}
+                      height={s.height}
+                      mobileWidth={s.mobileWidth}
+                      mobileHeight={s.mobileHeight}
+                    />
                   </div>
                 </Reveal>
               );
