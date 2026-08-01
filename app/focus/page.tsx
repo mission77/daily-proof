@@ -14,11 +14,11 @@ import {
 import { getPractice } from "@/lib/repos/practices";
 import { saveProof } from "@/lib/repos/sessions";
 import { pickQuote, type Quote } from "@/lib/quotes";
-import { renderShareCard, shareCard } from "@/lib/sharecard";
+import { formatFinished } from "@/lib/time";
 import { playCompletionSound, vibrateCompletion } from "@/lib/completionSound";
 import { FlipTimer } from "@/components/FlipTimer";
 import { Wordmark } from "@/components/Wordmark";
-import { useToast } from "@/components/Toast";
+import { ProofSaved } from "@/components/ProofSaved";
 import { AccessGuard } from "@/components/AccessGuard";
 
 /** Focus lives outside the (app) shell for a chrome-free screen, so it needs
@@ -33,7 +33,6 @@ export default function FocusPage() {
 
 function FocusSession() {
   const router = useRouter();
-  const toast = useToast();
   const [session, setSession] = useState<ActiveSession | null | undefined>(undefined);
   const [practice, setPractice] = useState<Practice | undefined>();
   const [now, setNow] = useState(() => Date.now());
@@ -48,7 +47,6 @@ function FocusSession() {
   // Proof-saved state (post save; the active session is already cleared)
   const [savedEntry, setSavedEntry] = useState<SessionEntry | null>(null);
   const [savedQuote, setSavedQuote] = useState<Quote | null>(null);
-  const [sharing, setSharing] = useState(false);
 
   // Confirm dialogs: cancelling discards everything; restarting wipes
   // elapsed time. Both are one-tap-away and irreversible, so neither fires
@@ -172,6 +170,16 @@ function FocusSession() {
     const measurementValue =
       usesMeasurement && measurement.trim() !== "" ? Number(measurement) : undefined;
 
+    // Picked before saving so it can be snapshotted onto the entry itself —
+    // sharing this proof later (from the Book) recreates the exact same
+    // card instead of drawing a new random quote.
+    let quote: Quote | null = null;
+    try {
+      quote = await pickQuote(liveName || session.practiceNameSnapshot, practice?.description);
+    } catch {
+      /* quote is optional */
+    }
+
     const entry = await saveProof({
       // Deterministic id: one active session yields one proof entry. If the
       // steps after the save ever fail and the finish screen reappears,
@@ -188,15 +196,10 @@ function FocusSession() {
       completedAt: nowIso(),
       mode: session.mode,
       plannedDurationMs: session.plannedDurationMs,
+      quote: quote ?? undefined,
     });
     // The proof is saved; nothing decorative may undo that from the user's
-    // point of view. A failed quote or cleanup must still land on "saved".
-    let quote: Quote | null = null;
-    try {
-      quote = await pickQuote(entry.practiceNameSnapshot, practice?.description);
-    } catch {
-      /* quote is optional */
-    }
+    // point of view. A failed cleanup must still land on "saved".
     try {
       await clearActiveSession();
     } catch {
@@ -216,63 +219,9 @@ function FocusSession() {
     router.push("/studio");
   }
 
-  async function handleShare() {
-    if (!savedEntry || !savedQuote || sharing) return;
-    setSharing(true);
-    try {
-      const blob = await renderShareCard({
-        practiceName: savedEntry.practiceNameSnapshot,
-        durationMs: savedEntry.durationMs,
-        measurement: savedEntry.measurement,
-        measurementUnit: savedEntry.measurementUnit,
-        completedAt: savedEntry.completedAt,
-        quote: savedQuote,
-      });
-      const result = await shareCard(blob, savedEntry.practiceNameSnapshot);
-      if (result === "downloaded") toast("Share card saved as image");
-    } catch {
-      toast("Couldn't create the share card");
-    } finally {
-      setSharing(false);
-    }
-  }
-
   // ---------- Proof saved ----------
   if (savedEntry) {
-    return (
-      <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col items-center justify-center px-5 py-10 text-center lg:max-w-lg">
-        <Wordmark className="text-lg" />
-        <div className="mt-8 flex h-12 w-12 items-center justify-center rounded-full bg-ember/10 text-ember-ink">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
-            <path d="M4 12.5l5 5L20 6.5" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </div>
-        <h1 className="mt-4 font-display text-3xl font-semibold">Proof saved.</h1>
-        <p className="mt-2 text-[15px] text-ink-soft">
-          {savedEntry.practiceNameSnapshot} · {formatFinished(savedEntry.durationMs)}
-        </p>
-        {savedQuote && (
-          <blockquote className="mx-auto mt-7 max-w-sm">
-            <p className="font-display text-[17px] italic leading-relaxed text-ink-soft">
-              &ldquo;{savedQuote.text}&rdquo;
-            </p>
-            {savedQuote.author && (
-              <cite className="mt-1.5 block text-[13px] not-italic text-ink-faint">
-                &mdash; {savedQuote.author}
-              </cite>
-            )}
-          </blockquote>
-        )}
-        <div className="mt-9 flex w-full max-w-xs flex-col gap-3">
-          <button className="btn-primary w-full" onClick={() => router.push("/book")}>
-            Done
-          </button>
-          <button className="btn-quiet w-full" onClick={handleShare} disabled={sharing}>
-            {sharing ? "Preparing card\u2026" : "Share today's proof"}
-          </button>
-        </div>
-      </div>
-    );
+    return <ProofSaved entry={savedEntry} quote={savedQuote} onDone={() => router.push("/book")} />;
   }
 
   if (session === undefined || session === null) {
@@ -585,13 +534,4 @@ function ConfirmAction({
       </div>
     </div>
   );
-}
-
-function formatFinished(ms: number): string {
-  const totalSec = Math.floor(ms / 1000);
-  const h = Math.floor(totalSec / 3600);
-  const m = Math.floor((totalSec % 3600) / 60);
-  const s = totalSec % 60;
-  const two = (n: number) => String(n).padStart(2, "0");
-  return h > 0 ? `${h}:${two(m)}:${two(s)}` : `${two(m)}:${two(s)}`;
 }

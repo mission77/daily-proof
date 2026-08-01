@@ -124,6 +124,51 @@ export async function seedAccess(
   });
 }
 
+export interface SeedSession {
+  id: string;
+  practiceId: string;
+  practiceNameSnapshot: string;
+  durationMs: number;
+  completed: boolean;
+  measurement?: number;
+  measurementUnit?: string;
+  notes?: string;
+  startedAt: string;
+  completedAt: string;
+  createdAt: string;
+  updatedAt: string;
+  noteEdited: boolean;
+  mode?: "stopwatch" | "timer";
+  plannedDurationMs?: number;
+  quote?: { id: string; text: string; author?: string };
+}
+
+export function newSession(overrides: Partial<SeedSession> = {}): SeedSession {
+  const now = new Date().toISOString();
+  return {
+    id: `session-${Math.random().toString(36).slice(2)}`,
+    practiceId: "practice-seed",
+    practiceNameSnapshot: "Deep work",
+    durationMs: 25 * 60_000,
+    completed: true,
+    startedAt: now,
+    completedAt: now,
+    createdAt: now,
+    updatedAt: now,
+    noteEdited: false,
+    ...overrides,
+  };
+}
+
+/** Seeds a finished proof entry directly (bypassing Timer/Stopwatch/Log
+ *  Session UI) — for tests that only care about how the Book displays and
+ *  shares an already-saved entry. */
+export async function seedSession(page: Page, overrides: Partial<SeedSession> = {}): Promise<SeedSession> {
+  const session = newSession(overrides);
+  await seedRecord(page, "sessions", session);
+  return session;
+}
+
 export async function readSessions(page: Page): Promise<any[]> {
   return page.evaluate(
     ({ DB_NAME, DB_VERSION }) => {

@@ -21,7 +21,9 @@ test("Log session sits alongside Start session with equal visual weight", async 
   await expect(page.getByText("For work done with a watch, another timer, or no timer at all.")).toBeVisible();
 });
 
-test("Log session: fill and save produces the same kind of proof as a timed session", async ({ page }) => {
+test("Log session: fill and save ends on the same Proof Saved screen as Timer/Stopwatch, then Done reaches the Book", async ({
+  page,
+}) => {
   await page.goto("/");
   await seedAccess(page);
   await seedPractice(page, { name: "Reading" });
@@ -35,8 +37,20 @@ test("Log session: fill and save produces the same kind of proof as a timed sess
   await page.locator("#log-notes").fill("Read at the library, no timer running.");
   await page.getByRole("button", { name: "Save proof" }).click();
 
-  await expect(page.getByText("Proof saved")).toBeVisible();
+  // Save Proof -> Proof Saved screen -> Share proof / Done, exactly like the
+  // Timer/Stopwatch flow — not a toast that dumps the user back on Studio.
   await expect(page.getByRole("dialog", { name: "Log a session" })).not.toBeVisible();
+  await expect(page.getByText("Proof saved.")).toBeVisible();
+  await expect(page.getByText("Reading · 45:00")).toBeVisible();
+  const shareButton = page.getByRole("button", { name: "Share proof" });
+  const doneButton = page.getByRole("button", { name: "Done" });
+  await expect(shareButton).toBeVisible();
+  await expect(shareButton).toHaveClass(/btn-primary/);
+  await expect(doneButton).toHaveClass(/btn-quiet/);
+
+  await doneButton.click();
+  await expect(page.getByText("Proof saved.")).not.toBeVisible();
+  await expect(page).toHaveURL("/studio");
 
   await page.goto("/book");
   await expect(page.getByText("Reading")).toBeVisible();
@@ -46,12 +60,14 @@ test("Log session: fill and save produces the same kind of proof as a timed sess
 
   // Same record shape saveProof() produces for Timer/Stopwatch: no mode set,
   // so a manually logged session is indistinguishable from a plain Stopwatch
-  // entry anywhere downstream (Book, backup, share cards).
+  // entry anywhere downstream (Book, backup, share cards) — and it carries a
+  // snapshotted quote, so it can generate a share card too.
   const sessions = await readSessions(page);
   expect(sessions).toHaveLength(1);
   expect(sessions[0].mode).toBeUndefined();
   expect(sessions[0].durationMs).toBe(45 * 60_000);
   expect(sessions[0].completed).toBe(false);
+  expect(sessions[0].quote?.text).toBeTruthy();
 });
 
 test("Log session: rejects a missing or invalid duration instead of saving", async ({ page }) => {

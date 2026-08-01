@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ActiveSession, Practice, SessionMode, nowIso } from "@/lib/types";
+import { ActiveSession, Practice, SessionEntry, SessionMode, nowIso } from "@/lib/types";
 import {
   PracticeInput,
   createPractice,
@@ -25,7 +25,9 @@ import { primeAudioContext } from "@/lib/completionSound";
 import { PracticeForm } from "@/components/PracticeForm";
 import { TimerSetup, TimerChoice } from "@/components/TimerSetup";
 import { LogSessionForm, LogSessionInput } from "@/components/LogSessionForm";
+import { ProofSaved } from "@/components/ProofSaved";
 import { saveProof } from "@/lib/repos/sessions";
+import { pickQuote, type Quote } from "@/lib/quotes";
 import { useToast } from "@/components/Toast";
 
 const EVIDENCE_LABEL: Record<string, string> = {
@@ -45,6 +47,8 @@ export default function StudioPage() {
   const [formTarget, setFormTarget] = useState<Practice | "new" | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<Practice | null>(null);
   const [logging, setLogging] = useState(false);
+  const [savedEntry, setSavedEntry] = useState<SessionEntry | null>(null);
+  const [savedQuote, setSavedQuote] = useState<Quote | null>(null);
   const [initialMode, setInitialMode] = useState<SessionMode>("stopwatch");
   const [initialMinutes, setInitialMinutes] = useState(25);
   const [choice, setChoice] = useState<TimerChoice>({ mode: "stopwatch" });
@@ -123,11 +127,20 @@ export default function StudioPage() {
   /** Same saveProof() call the Timer/Stopwatch flow ends with — a manually
    *  logged session becomes an ordinary proof entry, not a lesser one.
    *  mode stays unset, exactly like a Stopwatch session: nothing in Daily
-   *  Proof timed this, so there's no timer mode to record. */
+   *  Proof timed this, so there's no timer mode to record. It also ends on
+   *  the exact same Proof Saved screen as Timer/Stopwatch, quote and Share
+   *  proof included — a logged session should be indistinguishable from a
+   *  timed one. */
   async function handleLogSession(input: LogSessionInput) {
     const p = practices.find((pr) => pr.id === input.practiceId);
     if (!p) return;
-    await saveProof({
+    let quote: Quote | null = null;
+    try {
+      quote = await pickQuote(p.name, p.description);
+    } catch {
+      /* quote is optional */
+    }
+    const entry = await saveProof({
       practiceId: p.id,
       practiceNameSnapshot: p.name,
       durationMs: input.durationMs,
@@ -137,9 +150,11 @@ export default function StudioPage() {
       notes: input.notes,
       startedAt: new Date(new Date(input.completedAt).getTime() - input.durationMs).toISOString(),
       completedAt: input.completedAt,
+      quote: quote ?? undefined,
     });
     setLogging(false);
-    toast("Proof saved");
+    setSavedEntry(entry);
+    setSavedQuote(quote);
   }
 
   async function chooseFocus(id: string) {
@@ -415,6 +430,19 @@ export default function StudioPage() {
           onSave={handleLogSession}
           onClose={() => setLogging(false)}
         />
+      )}
+
+      {savedEntry && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-bg">
+          <ProofSaved
+            entry={savedEntry}
+            quote={savedQuote}
+            onDone={() => {
+              setSavedEntry(null);
+              setSavedQuote(null);
+            }}
+          />
+        </div>
       )}
 
       {confirmDelete && (

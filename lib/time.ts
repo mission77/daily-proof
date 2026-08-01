@@ -22,6 +22,18 @@ export function formatTimeOfDay(iso: string): string {
   return new Date(iso).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
 }
 
+/** Clock-style elapsed time for the Focus/Proof-saved screens: "5:32",
+ *  "1:05:32". Distinct from formatDuration's "1h 12m", which reads better
+ *  in the Book's compact list. */
+export function formatFinished(ms: number): string {
+  const totalSec = Math.floor(ms / 1000);
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  const two = (n: number) => String(n).padStart(2, "0");
+  return h > 0 ? `${h}:${two(m)}:${two(s)}` : `${two(m)}:${two(s)}`;
+}
+
 export function formatDayHeading(date: Date): string {
   const today = new Date();
   const yesterday = new Date(today);

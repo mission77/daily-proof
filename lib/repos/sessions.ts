@@ -1,5 +1,6 @@
 import { STORES, idbDelete, idbGet, idbGetAll, idbPut } from "@/lib/db";
 import { SessionEntry, SessionMode, isSessionRecord, newId, nowIso } from "@/lib/types";
+import type { Quote } from "@/lib/quotes";
 
 export interface SaveProofInput {
   /** Optional stable id. Passing the same id twice overwrites (idempotent save). */
@@ -16,6 +17,9 @@ export interface SaveProofInput {
   /** Absent = Stopwatch. */
   mode?: SessionMode;
   plannedDurationMs?: number;
+  /** The quote shown on the Proof Saved screen, snapshotted onto the entry
+   *  so sharing it later recreates the exact same card. */
+  quote?: Quote;
 }
 
 export async function saveProof(input: SaveProofInput): Promise<SessionEntry> {
@@ -35,6 +39,7 @@ export async function saveProof(input: SaveProofInput): Promise<SessionEntry> {
     noteEdited: false,
     mode: input.mode,
     plannedDurationMs: input.mode === "timer" ? input.plannedDurationMs : undefined,
+    quote: input.quote,
   };
   await idbPut(STORES.sessions, entry);
   return entry;

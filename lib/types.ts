@@ -39,6 +39,12 @@ export interface SessionEntry {
    *  durationMs remains the actual proof; overtime (if any) is
    *  durationMs − plannedDurationMs, computed on demand, never stored. */
   plannedDurationMs?: number;
+  /** Snapshot of the quote shown on the Proof Saved screen at save time.
+   *  Sharing this entry later (from the Book) reuses this exact quote
+   *  instead of picking a new random one, so a share card is always a
+   *  faithful recreation of the original proof. Absent for entries saved
+   *  before this existed, or if quote selection failed at save time. */
+  quote?: { id: string; text: string; author?: string };
 }
 
 // ---------- Active session (survives refresh) ----------

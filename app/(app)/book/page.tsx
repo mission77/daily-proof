@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { SessionEntry } from "@/lib/types";
 import { deleteSession, editSessionNote, listSessionsForDay } from "@/lib/repos/sessions";
 import { formatDayHeading, formatDayHeadingShort, formatDuration, formatTimeOfDay, isSameLocalDay } from "@/lib/time";
+import { pickQuote } from "@/lib/quotes";
+import { renderShareCard, shareCard } from "@/lib/sharecard";
 import { useToast } from "@/components/Toast";
 import { BackupReminder } from "@/components/BackupReminder";
 
@@ -16,6 +18,10 @@ export default function BookPage() {
   const [date, setDate] = useState<Date | null>(null);
   const [entries, setEntries] = useState<SessionEntry[] | null>(null);
   const [editing, setEditing] = useState<SessionEntry | null>(null);
+  // Entry id currently generating a share card — every proof in the Book is
+  // shareable, not just the one just finished, but only one card renders at
+  // a time.
+  const [sharingId, setSharingId] = useState<string | null>(null);
   // Bumping this re-reads the current day from IndexedDB (the one source of truth).
   const [version, setVersion] = useState(0);
   // True while the user is on "today" (the default view). Only then does the
@@ -88,6 +94,34 @@ export default function BookPage() {
     setVersion((v) => v + 1);
   }
 
+  /** Any proof in the Book is shareable, not just the one just finished —
+   *  reuses the exact same renderShareCard()/shareCard() the Proof Saved
+   *  screen uses, no separate design or logic. The quote snapshotted onto
+   *  the entry at save time is reused so the card is always a faithful
+   *  recreation of the original, not a freshly randomized one; only entries
+   *  saved before quotes were snapshotted fall back to picking one now. */
+  async function shareEntry(entry: SessionEntry) {
+    if (sharingId) return;
+    setSharingId(entry.id);
+    try {
+      const quote = entry.quote ?? (await pickQuote(entry.practiceNameSnapshot));
+      const blob = await renderShareCard({
+        practiceName: entry.practiceNameSnapshot,
+        durationMs: entry.durationMs,
+        measurement: entry.measurement,
+        measurementUnit: entry.measurementUnit,
+        completedAt: entry.completedAt,
+        quote,
+      });
+      const result = await shareCard(blob, entry.practiceNameSnapshot);
+      if (result === "downloaded") toast("Share card saved as image");
+    } catch {
+      toast("Couldn't create the share card");
+    } finally {
+      setSharingId(null);
+    }
+  }
+
   return (
     <div>
       <BackupReminder />
@@ -131,7 +165,7 @@ export default function BookPage() {
       {entries !== null && entries.length > 0 && (
         <ul className="card mt-6 divide-y divide-line">
           {entries.map((e) => (
-            <li key={e.id}>
+            <li key={e.id} className="relative">
               {/* A journal entry, not a database row: the practice name leads,
                   the metadata recedes, the reflection gets room to breathe. */}
               <button
@@ -139,7 +173,7 @@ export default function BookPage() {
                 onClick={() => setEditing(e)}
                 aria-label={`Edit note for ${e.practiceNameSnapshot}`}
               >
-                <div className="flex items-baseline justify-between gap-3">
+                <div className="flex items-baseline justify-between gap-3 pr-7">
                   <span className="truncate text-[17px] font-semibold">{e.practiceNameSnapshot}</span>
                   <span className="shrink-0 text-[13px] tabular-nums text-ink-faint">
                     {formatTimeOfDay(e.completedAt)}
@@ -176,6 +210,17 @@ export default function BookPage() {
                     {e.notes}
                   </p>
                 )}
+              </button>
+              <button
+                className="absolute right-4 top-5 rounded-md p-1 text-[15px] leading-none text-ink-faint transition-colors hover:text-ink disabled:opacity-40 sm:right-5"
+                aria-label={`Share proof for ${e.practiceNameSnapshot}`}
+                disabled={sharingId === e.id}
+                onClick={(ev) => {
+                  ev.stopPropagation();
+                  shareEntry(e);
+                }}
+              >
+                ↗
               </button>
             </li>
           ))}
